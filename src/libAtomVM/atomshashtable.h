@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _ATOMSHASHTABLE_H_
-#define _ATOMSHASHTABLE_H_
+#pragma once
 
 #include "atom.h"
 
@@ -36,5 +35,3 @@ unsigned long atomshashtable_get_value(const struct AtomsHashTable *hash_table, 
 int atomshashtable_has_key(const struct AtomsHashTable *hash_table, AtomString string);
 
 #define TO_ATOMSHASHTABLE_VALUE(value) ((unsigned long) (value))
-
-#endif

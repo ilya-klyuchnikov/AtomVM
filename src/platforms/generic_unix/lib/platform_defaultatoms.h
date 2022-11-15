@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _PLATFORM_DEFAULTATOMS_H_
-#define _PLATFORM_DEFAULTATOMS_H_
+#pragma once
 
 #include "defaultatoms.h"
 
@@ -88,5 +87,3 @@
 #define ACCEPT_ATOM term_from_atom_index(ACCEPT_ATOM_INDEX)
 #define FD_ATOM term_from_atom_index(FD_ATOM_INDEX)
 #define GENERIC_UNIX_ATOM TERM_FROM_ATOM_INDEX(GENERIC_UNIX_ATOM_INDEX)
-
-#endif

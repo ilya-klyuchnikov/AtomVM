@@ -23,8 +23,7 @@
  * @brief BIF private functions.
  */
 
-#ifndef _BIF_H_
-#define _BIF_H_
+#pragma once
 
 #include <stdbool.h>
 
@@ -101,5 +100,3 @@ term bif_erlang_less_than_or_equal_2(Context *ctx, term arg1, term arg2);
 term bif_erlang_greater_than_or_equal_2(Context *ctx, term arg1, term arg2);
 
 term bif_erlang_get_1(Context *ctx, term arg1);
-
-#endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _GENERIC_UNIX_SYS_H_
-#define _GENERIC_UNIX_SYS_H_
+#pragma once
 
 #include <time.h>
 
@@ -42,5 +41,3 @@ struct GenericUnixPlatformData
 };
 
 Context *socket_init(GlobalContext *global, term opts);
-
-#endif

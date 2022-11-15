@@ -25,8 +25,7 @@
  * @details Miscellaneous functions and macros useful for debug.
  */
 
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#pragma once
 
 #include "context.h"
 
@@ -94,6 +93,4 @@ void debug_print_processes_list(struct ListHead *processes);
     #define DEBUG_DUMP_STACK debug_dump_stack
 #else
     #define DEBUG_DUMP_STACK(...)
-#endif
-
 #endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _VALUESHASHTABLE_H_
-#define _VALUESHASHTABLE_H_
+#pragma once
 
 struct ValuesHashTable
 {
@@ -32,5 +31,3 @@ struct ValuesHashTable *valueshashtable_new();
 int valueshashtable_insert(struct ValuesHashTable *hash_table, unsigned long key, unsigned long value);
 unsigned long valueshashtable_get_value(const struct ValuesHashTable *hash_table, unsigned long key, unsigned long default_value);
 int valueshashtable_has_key(const struct ValuesHashTable *hash_table, unsigned long key);
-
-#endif

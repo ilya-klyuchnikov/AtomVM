@@ -25,8 +25,7 @@
  * @details GlobalContext keeps the state of an AtomVM instance, multiple instances can run simultaneously.
  */
 
-#ifndef _GLOBALCONTEXT_H_
-#define _GLOBALCONTEXT_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -256,5 +255,3 @@ static inline uint64_t globalcontext_get_ref_ticks(GlobalContext *global)
 {
     return ++global->ref_ticks;
 }
-
-#endif

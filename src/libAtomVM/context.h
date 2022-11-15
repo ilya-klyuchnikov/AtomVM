@@ -25,8 +25,7 @@
  * @details A context represent the state of a running erlang process or port.
  */
 
-#ifndef _CONTEXT_H_
-#define _CONTEXT_H_
+#pragma once
 
 #include "globalcontext.h"
 #include "linkedlist.h"
@@ -299,5 +298,3 @@ size_t context_size(Context *ctx);
 
 uint64_t context_monitor(Context *ctx, term monitor_pid, bool linked);
 void context_demonitor(Context *ctx, term monitor_pid, bool linked);
-
-#endif

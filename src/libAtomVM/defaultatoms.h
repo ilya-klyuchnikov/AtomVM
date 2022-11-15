@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _DEFAULTATOMS_H_
-#define _DEFAULTATOMS_H_
+#pragma once
 
 #include "globalcontext.h"
 
@@ -192,5 +191,3 @@
 void defaultatoms_init(GlobalContext *glb);
 
 void platform_defaultatoms_init(GlobalContext *glb);
-
-#endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _LIST_H_
-#define _LIST_H_
+#pragma once
 
 #include "linkedlist.h"
 
@@ -73,5 +72,3 @@ static inline struct ListHead *list_last(struct ListHead *head)
 {
     return head->prev;
 }
-
-#endif

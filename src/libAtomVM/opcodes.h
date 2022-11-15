@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _OPCODES_H_
-#define _OPCODES_H_
+#pragma once
 
 #define OP_LABEL 1
 #define OP_FUNC_INFO 2
@@ -134,5 +133,3 @@
 #define OP_BS_SET_POSITION 168
 #define OP_SWAP 169
 #define OP_BS_START_MATCH4 170
-
-#endif

@@ -25,8 +25,7 @@
  * @details Scheduling functions are used to schedule processes.
  */
 
-#ifndef _SCHEDULER_H_
-#define _SCHEDULER_H_
+#pragma once
 
 #include "context.h"
 #include "globalcontext.h"
@@ -101,5 +100,3 @@ Context *scheduler_next(GlobalContext *global, Context *c);
 void scheduler_set_timeout(Context *ctx, uint32_t timeout);
 
 void scheduler_cancel_timeout(Context *ctx);
-
-#endif

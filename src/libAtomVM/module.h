@@ -25,8 +25,7 @@
  * @details This header defines all the module loading functions and the Module struct.
  */
 
-#ifndef _MODULE_H_
-#define _MODULE_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -244,5 +243,3 @@ static inline const uint8_t *module_get_str(Module *mod, size_t offset, size_t *
     *remaining = mod->str_table_len - offset;
     return ((const uint8_t *) mod->str_table) + 8 + offset;
 }
-
-#endif

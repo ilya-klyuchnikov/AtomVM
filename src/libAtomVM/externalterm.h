@@ -25,8 +25,7 @@
  * @details This header provides external term deserialization functions.
  */
 
-#ifndef _EXTERNALTERM_H_
-#define _EXTERNALTERM_H_
+#pragma once
 
 #include "term.h"
 
@@ -82,5 +81,3 @@ enum ExternalTermResult externalterm_from_binary(Context *ctx, term *dst, term b
  * deserialization fails.
  */
 term externalterm_to_binary(Context *ctx, term t);
-
-#endif

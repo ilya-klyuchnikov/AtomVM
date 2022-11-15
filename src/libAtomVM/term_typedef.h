@@ -25,8 +25,7 @@
  * @details This header defines term time and few related macros.
  */
 
-#ifndef _TERM_TYPEDEF_H_
-#define _TERM_TYPEDEF_H_
+#pragma once
 
 #include <limits.h>
 #include <inttypes.h>
@@ -120,6 +119,4 @@ typedef uint64_t avm_uint64_t;
         term t;
         avm_float_t f;
     } float_term_t;
-#endif
-
 #endif

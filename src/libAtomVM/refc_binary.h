@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _REFC_BINARY_H_
-#define _REFC_BINARY_H_
+#pragma once
 
 #include "list.h"
 #include <stdbool.h>
@@ -72,5 +71,3 @@ bool refc_binary_decrement_refcount(struct RefcBinary *ptr);
  * TODO consider implementing erlang:memory/0,1 instead
  */
 term refc_binary_create_binary_info(Context *ctx);
-
-#endif // _REFC_BINARY_H_

@@ -19,8 +19,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _BITSTRING_H_
-#define _BITSTRING_H_
+#pragma once
 
 #include "term.h"
 
@@ -291,5 +290,3 @@ static inline bool bitstring_insert_integer(term dst_bin, size_t offset, avm_int
 
     return bitstring_insert_any_integer((uint8_t *) term_binary_data(dst_bin), offset, value, n, bs_flags);
 }
-
-#endif

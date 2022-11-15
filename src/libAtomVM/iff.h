@@ -25,8 +25,7 @@
  * @details BEAM module parser function and related defines.
  */
 
-#ifndef _IFF_H_
-#define _IFF_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -77,5 +76,3 @@ void scan_iff(const void *iff_binary, int file_size, unsigned long *offsets, uns
  * @returns 1 if beam_data points to a valid binary, otherwise 0 is returned.
  */
 int iff_is_valid_beam(const void *beam_data);
-
-#endif

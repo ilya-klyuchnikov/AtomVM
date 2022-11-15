@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _DICTIONARY_H_
-#define _DICTIONARY_H_
+#pragma once
 
 #include "list.h"
 #include "term.h"
@@ -35,5 +34,3 @@ term dictionary_put(struct ListHead *dict, Context *ctx, term key, term value);
 term dictionary_get(struct ListHead *dict, Context *ctx, term key);
 term dictionary_erase(struct ListHead *dict, Context *ctx, term key);
 void dictionary_destroy(struct ListHead *dict);
-
-#endif

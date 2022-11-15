@@ -25,8 +25,7 @@
  * @details Mailbox management functions should be used to send messages to a certain process or port and to receive them.
  */
 
-#ifndef _MAILBOX_H_
-#define _MAILBOX_H_
+#pragma once
 
 #include "context.h"
 #include "list.h"
@@ -93,5 +92,3 @@ void mailbox_remove(Context *c);
  * @param m the message to free.
  */
 void mailbox_destroy_message(Message *m);
-
-#endif

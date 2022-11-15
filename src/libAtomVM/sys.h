@@ -25,8 +25,7 @@
  * @details This header defines platform dependent functions, that mostly deals with events.
  */
 
-#ifndef _SYS_H_
-#define _SYS_H_
+#pragma once
 
 #include "globalcontext.h"
 #include "linkedlist.h"
@@ -91,5 +90,3 @@ void sys_stop_millis_timer();
 uint32_t sys_millis();
 
 void sys_sleep(GlobalContext *glb);
-
-#endif

@@ -23,8 +23,7 @@
  * @brief Private NIFs
  */
 
-#ifndef _NIFS_H_
-#define _NIFS_H_
+#pragma once
 
 #include "atom.h"
 #include "context.h"
@@ -43,5 +42,3 @@
     return term_invalid_term();
 
 const struct Nif *nifs_get(AtomString module, AtomString function, int arity);
-
-#endif

@@ -25,8 +25,7 @@
  * @details Structs required to handle both exported/imported NIFs and functions.
  */
 
-#ifndef _EXPORTEDFUNCTION_H_
-#define _EXPORTEDFUNCTION_H_
+#pragma once
 
 #include "term.h"
 
@@ -96,5 +95,3 @@ union imported_func
     const struct ExportedFunction *func;
     BifImpl bif;
 };
-
-#endif

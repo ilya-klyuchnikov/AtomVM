@@ -25,8 +25,7 @@
  * @details This header implements functions for term references handling, term references remain valid after a garbage collection, so they are useful in native C code.
  */
 
-#ifndef _CCONTEXT_H_
-#define _CCONTEXT_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -131,5 +130,3 @@ static inline term ccontext_get_term(const struct CContext *ccontext, term_ref t
 {
     return *(ccontext->ctx->e + ccontext->terms_count - tref);
 }
-
-#endif

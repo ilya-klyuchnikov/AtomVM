@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _PORT_H_
-#define _PORT_H_
+#pragma once
 
 #include "context.h"
 #include "defaultatoms.h"
@@ -36,5 +35,3 @@ void port_send_reply(Context *ctx, term pid, term ref, term reply);
 void port_send_message(Context *ctx, term pid, term msg);
 void port_ensure_available(Context *ctx, size_t size);
 int port_is_standard_port_command(term msg);
-
-#endif

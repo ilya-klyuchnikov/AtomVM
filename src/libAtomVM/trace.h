@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _TRACE_H_
-#define _TRACE_H_
+#pragma once
 
 #ifndef TRACE
     #ifdef ENABLE_TRACE
@@ -34,4 +33,3 @@
 #define USED_BY_TRACE(x) \
     (void) (x)
 
-#endif

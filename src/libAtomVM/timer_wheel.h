@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _TIMER_WHEEL_H_
-#define _TIMER_WHEEL_H_
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -84,5 +83,3 @@ static inline uint64_t timer_wheel_expiry_to_monotonic(const struct TimerWheel *
 {
     return tw->monotonic_time + expiry;
 }
-
-#endif

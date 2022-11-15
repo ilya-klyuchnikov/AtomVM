@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _OVERFLOW_HELPERS_H_
-#define _OVERFLOW_HELPERS_H_
+#pragma once
 
 #ifdef __GNUC__
 #if __GNUC__ >= 5
@@ -158,6 +157,4 @@ static inline int atomvm_mul_overflow(avm_int_t a, avm_int_t b, avm_int_t *res)
         #error "Unsupported AVM_INT_MAX size"
     #endif
 }
-#endif
-
 #endif

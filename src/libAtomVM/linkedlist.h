@@ -25,8 +25,7 @@
  * @details This header implements manipulation functions for doubly linked circular linked lists.
  */
 
-#ifndef _LINKEDLIST_H_
-#define _LINKEDLIST_H_
+#pragma once
 
 #include <stdlib.h>
 
@@ -142,5 +141,3 @@ static inline size_t linkedlist_length(const struct ListHead *list)
         return len;
     }
 }
-
-#endif

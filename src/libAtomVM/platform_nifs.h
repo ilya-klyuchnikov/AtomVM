@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _PLATFORM_NIFS_H_
-#define _PLATFORM_NIFS_H_
+#pragma once
 
 #include "exportedfunction.h"
 #include "module.h"
@@ -35,5 +34,3 @@
  *           NULL, if there is no such Nif.
  */
 const struct Nif *platform_nifs_get_nif(const char *nifname);
-
-#endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _TEMPSTACK_H_
-#define _TEMPSTACK_H_
+#pragma once
 
 struct TempStack
 {
@@ -76,5 +75,3 @@ static inline term temp_stack_pop(struct TempStack *temp_stack)
 
     return value;
 }
-
-#endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _SOCKET_DRIVER_H_
-#define _SOCKET_DRIVER_H_
+#pragma once
 
 #include "context.h"
 #include "term.h"
@@ -37,5 +36,3 @@ term socket_driver_get_port(Context *ctx);
 void socket_driver_do_accept(Context *ctx, term pid, term ref, term timeout);
 term socket_driver_sockname(Context *ctx);
 term socket_driver_peername(Context *ctx);
-
-#endif

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _MAPPED_FILE_H_
-#define _MAPPED_FILE_H_
+#pragma once
 
 typedef struct
 {
@@ -30,5 +29,3 @@ typedef struct
 
 extern MappedFile *mapped_file_open_beam(const char *file_name);
 extern void mapped_file_close(MappedFile *mf);
-
-#endif

@@ -27,7 +27,7 @@
 #include "memory.h"
 #include "tempstack.h"
 
-//#define ENABLE_TRACE
+// #define ENABLE_TRACE
 
 #include "trace.h"
 

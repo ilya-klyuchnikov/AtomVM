@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1-or-later
  */
 
-#ifndef _INTEROP_H_
-#define _INTEROP_H_
+#pragma once
 
 #include "context.h"
 #include "term.h"
@@ -95,5 +94,3 @@ static inline term interop_kv_get_value(term kv, AtomString key, GlobalContext *
 {
     return interop_kv_get_value_default(kv, key, term_invalid_term(), glb);
 }
-
-#endif

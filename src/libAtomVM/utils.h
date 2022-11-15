@@ -25,8 +25,7 @@
  * @details Miscellaneous functions and macros useful for different tasks, like endian byteswap, unaligned reads, marking unused vars, etc...
  */
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#pragma once
 
 #ifdef __ORDER_LITTLE_ENDIAN__
     #ifdef __GNUC__
@@ -173,6 +172,4 @@ static inline void *rand_fail_calloc(int n, unsigned long alloc_size)
     }
 #else
 #define AVM_ABORT() abort()
-#endif
-
 #endif

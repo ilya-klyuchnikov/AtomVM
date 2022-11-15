@@ -25,8 +25,7 @@
  * @details This header implements term manipulation functions.
  */
 
-#ifndef _TERM_H_
-#define _TERM_H_
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -1655,5 +1654,3 @@ static inline term term_get_sub_binary_ref(term t)
     const term *boxed_value = term_to_const_term_ptr(t);
     return boxed_value[3];
 }
-
-#endif
