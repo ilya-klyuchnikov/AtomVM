@@ -21,10 +21,6 @@
 #ifndef _DICTIONARY_H_
 #define _DICTIONARY_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "list.h"
 #include "term.h"
 
@@ -39,9 +35,5 @@ term dictionary_put(struct ListHead *dict, Context *ctx, term key, term value);
 term dictionary_get(struct ListHead *dict, Context *ctx, term key);
 term dictionary_erase(struct ListHead *dict, Context *ctx, term key);
 void dictionary_destroy(struct ListHead *dict);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

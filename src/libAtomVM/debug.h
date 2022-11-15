@@ -28,10 +28,6 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "context.h"
 
 /**
@@ -98,10 +94,6 @@ void debug_print_processes_list(struct ListHead *processes);
     #define DEBUG_DUMP_STACK debug_dump_stack
 #else
     #define DEBUG_DUMP_STACK(...)
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

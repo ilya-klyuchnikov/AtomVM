@@ -21,10 +21,6 @@
 #ifndef _MEMORY_H_
 #define _MEMORY_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "term_typedef.h"
 #include "utils.h"
 
@@ -119,9 +115,5 @@ unsigned long memory_estimate_usage(term t);
  * @param mso_list the list of mark-sweep object in a heap "space"
  */
 void memory_sweep_mso_list(term mso_list);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

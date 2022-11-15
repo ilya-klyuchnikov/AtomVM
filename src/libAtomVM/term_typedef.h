@@ -28,11 +28,7 @@
 #ifndef _TERM_TYPEDEF_H_
 #define _TERM_TYPEDEF_H_
 
-#ifdef __cplusplus
-#include <climits>
-#else
 #include <limits.h>
-#endif
 #include <inttypes.h>
 #include <stdint.h>
 

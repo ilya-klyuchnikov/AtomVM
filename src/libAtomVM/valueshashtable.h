@@ -21,10 +21,6 @@
 #ifndef _VALUESHASHTABLE_H_
 #define _VALUESHASHTABLE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct ValuesHashTable
 {
     int capacity;
@@ -36,9 +32,5 @@ struct ValuesHashTable *valueshashtable_new();
 int valueshashtable_insert(struct ValuesHashTable *hash_table, unsigned long key, unsigned long value);
 unsigned long valueshashtable_get_value(const struct ValuesHashTable *hash_table, unsigned long key, unsigned long default_value);
 int valueshashtable_has_key(const struct ValuesHashTable *hash_table, unsigned long key);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

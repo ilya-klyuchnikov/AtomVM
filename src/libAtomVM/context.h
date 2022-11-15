@@ -28,10 +28,6 @@
 #ifndef _CONTEXT_H_
 #define _CONTEXT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "globalcontext.h"
 #include "linkedlist.h"
 #include "term.h"
@@ -303,9 +299,5 @@ size_t context_size(Context *ctx);
 
 uint64_t context_monitor(Context *ctx, term monitor_pid, bool linked);
 void context_demonitor(Context *ctx, term monitor_pid, bool linked);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

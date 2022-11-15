@@ -21,10 +21,6 @@
 #ifndef _TIMER_WHEEL_H_
 #define _TIMER_WHEEL_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -88,9 +84,5 @@ static inline uint64_t timer_wheel_expiry_to_monotonic(const struct TimerWheel *
 {
     return tw->monotonic_time + expiry;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

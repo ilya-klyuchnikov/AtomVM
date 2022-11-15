@@ -21,10 +21,6 @@
 #ifndef _INTEROP_H_
 #define _INTEROP_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "context.h"
 #include "term.h"
 
@@ -99,9 +95,5 @@ static inline term interop_kv_get_value(term kv, AtomString key, GlobalContext *
 {
     return interop_kv_get_value_default(kv, key, term_invalid_term(), glb);
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

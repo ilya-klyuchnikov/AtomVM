@@ -28,10 +28,6 @@
 #ifndef _SYS_H_
 #define _SYS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "globalcontext.h"
 #include "linkedlist.h"
 #include "module.h"
@@ -95,9 +91,5 @@ void sys_stop_millis_timer();
 uint32_t sys_millis();
 
 void sys_sleep(GlobalContext *glb);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

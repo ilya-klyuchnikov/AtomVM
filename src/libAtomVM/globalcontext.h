@@ -28,10 +28,6 @@
 #ifndef _GLOBALCONTEXT_H_
 #define _GLOBALCONTEXT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 
 #include "atom.h"
@@ -47,9 +43,7 @@ struct Context;
 typedef struct Context Context;
 #endif
 
-#ifndef __cplusplus
 struct GlobalContext;
-#endif
 
 #ifndef TYPEDEF_MODULE
 #define TYPEDEF_MODULE
@@ -262,9 +256,5 @@ static inline uint64_t globalcontext_get_ref_ticks(GlobalContext *global)
 {
     return ++global->ref_ticks;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -21,10 +21,6 @@
 #ifndef _REFC_BINARY_H_
 #define _REFC_BINARY_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "list.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -76,9 +72,5 @@ bool refc_binary_decrement_refcount(struct RefcBinary *ptr);
  * TODO consider implementing erlang:memory/0,1 instead
  */
 term refc_binary_create_binary_info(Context *ctx);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // _REFC_BINARY_H_
