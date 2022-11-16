@@ -24,6 +24,7 @@
 #include "globalcontext.h"
 #include "list.h"
 #include "mailbox.h"
+#include "bitstring.h"
 
 #define T_DEST_REG(dreg_type, dreg) \
     (*dreg_type.ptr == ctx->x) ? 'x' : 'y', (dreg)

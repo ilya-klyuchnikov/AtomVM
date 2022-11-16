@@ -31,11 +31,6 @@
 #include "scheduler.h"
 #include "utils.h"
 
-#ifdef IMPL_EXECUTE_LOOP
-    #include "bitstring.h"
-    #include "mailbox.h"
-#endif
-
 #define ENABLE_OTP21
 #define ENABLE_OTP22
 #define ENABLE_OTP23
