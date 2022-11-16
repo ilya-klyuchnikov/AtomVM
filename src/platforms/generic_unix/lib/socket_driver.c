@@ -45,9 +45,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// #define ENABLE_TRACE
-#include "trace.h"
-
 #define BUFSIZE 128
 
 typedef struct SocketDriverData
@@ -152,7 +149,6 @@ static term do_bind(Context *ctx, term address, term port)
     if (bind(socket_data->sockfd, (struct sockaddr *) &serveraddr, address_len) == -1) {
         return port_create_sys_error_tuple(ctx, BIND_ATOM, errno);
     } else {
-        TRACE("socket_driver|do_bind: bound to %ld\n", p);
         if (getsockname(socket_data->sockfd, (struct sockaddr *) &serveraddr, &address_len) == -1) {
             return port_create_sys_error_tuple(ctx, GETSOCKNAME_ATOM, errno);
         } else {
@@ -217,7 +213,6 @@ static term do_connect(SocketDriverData *socket_data, Context *ctx, term address
     }
     char port_str[32];
     snprintf(port_str, 32, "%u", (unsigned short) term_to_int(port));
-    TRACE("socket_driver:do_connect: resolving to %s:%s over socket fd %i\n", addr_str, port_str, term_to_int32(socket_data->sockfd));
 
     struct addrinfo *server_info;
     int status = getaddrinfo(addr_str, port_str, &hints, &server_info);
@@ -246,7 +241,6 @@ static term do_connect(SocketDriverData *socket_data, Context *ctx, term address
     if (status == -1) {
         return port_create_sys_error_tuple(ctx, CONNECT_ATOM, errno);
     } else {
-        TRACE("socket_driver|do_connect: connected.\n");
         return OK_ATOM;
     }
 }
@@ -330,8 +324,6 @@ static term init_server_tcp_socket(Context *ctx, SocketDriverData *socket_data, 
         ret = do_listen(socket_data, ctx, params);
         if (ret != OK_ATOM) {
             close(sockfd);
-        } else {
-            TRACE("socket_driver|init_server_tcp_socket: listening on port %u\n", (unsigned) term_to_int(port));
         }
     }
     return ret;
@@ -447,11 +439,7 @@ void socket_driver_do_close(Context *ctx)
             linkedlist_remove(&platform->listeners, &socket_data->active_listener->listeners_list_head);
         }
     }
-    if (close(socket_data->sockfd) == -1) {
-        TRACE("socket_driver|socket_driver_do_close: close failed");
-    } else {
-        TRACE("socket_driver|socket_driver_do_close: closed socket\n");
-    }
+    close(socket_data->sockfd);
     scheduler_terminate(ctx);
 }
 
@@ -580,7 +568,6 @@ term socket_driver_do_send(Context *ctx, term buffer)
     if (sent_data == -1) {
         return port_create_sys_error_tuple(ctx, SEND_ATOM, errno);
     } else {
-        TRACE("socket_driver_do_send: sent data with len %li to fd %i\n", len, socket_data->sockfd);
         term sent_atom = term_from_int(sent_data);
         return port_create_ok_tuple(ctx, sent_atom);
     }
@@ -620,7 +607,6 @@ term socket_driver_do_sendto(Context *ctx, term dest_address, term dest_port, te
     if (sent_data == -1) {
         return port_create_sys_error_tuple(ctx, SENDTO_ATOM, errno);
     } else {
-        TRACE("socket_driver_do_sendto: sent data with len: %li, to: %i, port: %i\n", len, ntohl(addr.sin_addr.s_addr), ntohs(addr.sin_port));
         term sent_atom = term_from_int32(sent_data);
         return port_create_ok_tuple(ctx, sent_atom);
     }
@@ -665,7 +651,6 @@ static void active_recv_callback(EventListener *listener)
         port_send_message(ctx, pid, msg);
         socket_driver_do_close(ctx);
     } else {
-        TRACE("socket_driver|active_recv_callback: received data of len %li from fd %i\n", len, socket_data->sockfd);
         int ensure_packet_avail;
         int binary;
         if (socket_data->binary == TRUE_ATOM) {
@@ -728,7 +713,6 @@ static void passive_recv_callback(EventListener *listener)
         port_send_reply(ctx, pid, ref, port_create_sys_error_tuple(ctx, RECV_ATOM, errno));
         socket_driver_do_close(ctx);
     } else {
-        TRACE("socket_driver|passive_recv_callback: passive received data of len: %li\n", len);
         int ensure_packet_avail;
         if (socket_data->binary == TRUE_ATOM) {
             ensure_packet_avail = term_binary_data_size_in_terms(len) + BINARY_HEADER_SIZE;
@@ -933,7 +917,6 @@ static void accept_callback(EventListener *listener)
         term ref = term_from_ref_ticks(recvfrom_data->ref_ticks, ctx);
         port_send_reply(ctx, pid, ref, port_create_sys_error_tuple(ctx, ACCEPT_ATOM, errno));
     } else {
-        TRACE("socket_driver|accept_callback: accepted connection.  fd: %i\n", fd);
 
         term pid = recvfrom_data->pid;
         Context *new_ctx = create_accepting_socket(glb, socket_data, fd, pid);
@@ -989,7 +972,6 @@ void socket_driver_do_accept(Context *ctx, term pid, term ref, term timeout)
 
 static void socket_consume_mailbox(Context *ctx)
 {
-    TRACE("START socket_consume_mailbox\n");
     if (UNLIKELY(ctx->native_handler != socket_consume_mailbox)) {
         AVM_ABORT();
     }
@@ -1004,7 +986,6 @@ static void socket_consume_mailbox(Context *ctx)
 
     term cmd_name = term_get_tuple_element(cmd, 0);
     if (cmd_name == context_make_atom(ctx, init_a)) {
-        TRACE("init\n");
         term params = term_get_tuple_element(cmd, 1);
         term reply = socket_driver_do_init(ctx, params);
         port_send_reply(ctx, pid, ref, reply);
@@ -1014,64 +995,52 @@ static void socket_consume_mailbox(Context *ctx)
             // context_destroy(ctx);
         }
     } else if (cmd_name == context_make_atom(ctx, sendto_a)) {
-        TRACE("sendto\n");
         term dest_address = term_get_tuple_element(cmd, 1);
         term dest_port = term_get_tuple_element(cmd, 2);
         term buffer = term_get_tuple_element(cmd, 3);
         term reply = socket_driver_do_sendto(ctx, dest_address, dest_port, buffer);
         port_send_reply(ctx, pid, ref, reply);
     } else if (cmd_name == context_make_atom(ctx, send_a)) {
-        TRACE("send\n");
         term buffer = term_get_tuple_element(cmd, 1);
         term reply = socket_driver_do_send(ctx, buffer);
         port_send_reply(ctx, pid, ref, reply);
     } else if (cmd_name == context_make_atom(ctx, recvfrom_a)) {
-        TRACE("recvfrom\n");
         term length = term_get_tuple_element(cmd, 1);
         term timeout = term_get_tuple_element(cmd, 2);
         socket_driver_do_recvfrom(ctx, pid, ref, length, timeout);
     } else if (cmd_name == context_make_atom(ctx, recv_a)) {
-        TRACE("recv\n");
         term length = term_get_tuple_element(cmd, 1);
         term timeout = term_get_tuple_element(cmd, 2);
         socket_driver_do_recv(ctx, pid, ref, length, timeout);
     } else if (cmd_name == context_make_atom(ctx, accept_a)) {
-        TRACE("accept\n");
         term timeout = term_get_tuple_element(cmd, 1);
         socket_driver_do_accept(ctx, pid, ref, timeout);
     } else if (cmd_name == context_make_atom(ctx, close_a)) {
-        TRACE("close\n");
         port_send_reply(ctx, pid, ref, OK_ATOM);
         socket_driver_do_close(ctx);
         // TODO handle shutdown
         // socket_driver_delete_data(ctx->platform_data);
         // context_destroy(ctx);
     } else if (cmd_name == context_make_atom(ctx, sockname_a)) {
-        TRACE("sockname\n");
         term reply = socket_driver_sockname(ctx);
         port_send_reply(ctx, pid, ref, reply);
     } else if (cmd_name == context_make_atom(ctx, peername_a)) {
-        TRACE("peername\n");
         term reply = socket_driver_peername(ctx);
         port_send_reply(ctx, pid, ref, reply);
     } else if (cmd_name == context_make_atom(ctx, get_port_a)) {
         // TODO This function is not supported in the gen_tcp or gen_udp APIs.
         // It should be removed.  (Use inet:peername and inet:sockname instead)
-        TRACE("get_port\n");
         term reply = socket_driver_get_port(ctx);
         port_send_reply(ctx, pid, ref, reply);
     } else if (cmd_name == context_make_atom(ctx, controlling_process_a)) {
-        TRACE("controlling_process\n");
         term new_pid = term_get_tuple_element(cmd, 1);
         term reply = socket_driver_controlling_process(ctx, pid, new_pid);
         port_send_reply(ctx, pid, ref, reply);
     } else {
-        TRACE("unknown cmd\n");
         port_send_reply(ctx, pid, ref, port_create_error_tuple(ctx, BADARG_ATOM));
     }
 
     mailbox_destroy_message(message);
-    TRACE("END socket_consume_mailbox\n");
 }
 
 Context *socket_init(GlobalContext *glb, term opts)

@@ -30,7 +30,6 @@
 #include "defaultatoms.h"
 #include "dictionary.h"
 #include "overflow_helpers.h"
-#include "trace.h"
 #include "utils.h"
 
 //Ignore warning caused by gperf generated code
@@ -359,7 +358,6 @@ static term add_boxed_helper(Context *ctx, term arg1, term arg2)
 #endif
 
     } else if (!term_is_integer(arg1)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -372,7 +370,6 @@ static term add_boxed_helper(Context *ctx, term arg1, term arg2)
 #endif
 
     } else if (!term_is_integer(arg2)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -409,7 +406,6 @@ static term add_boxed_helper(Context *ctx, term arg1, term arg2)
                     return make_boxed_int64(ctx, res64);
 
                 #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                    TRACE("overflow: arg1: " AVM_INT64_FMT ", arg2: " AVM_INT64_FMT "\n", arg1, arg2);
                     RAISE_ERROR(OVERFLOW_ATOM);
                 #else
                     #error "Unsupported configuration."
@@ -427,7 +423,6 @@ static term add_boxed_helper(Context *ctx, term arg1, term arg2)
             avm_int64_t res;
 
             if (BUILTIN_ADD_OVERFLOW_INT64(val1, val2, &res)) {
-                TRACE("overflow: val1: " AVM_INT64_FMT ", val2: " AVM_INT64_FMT "\n", arg1, arg2);
                 RAISE_ERROR(OVERFLOW_ATOM);
             }
 
@@ -479,7 +474,6 @@ static term sub_boxed_helper(Context *ctx, term arg1, term arg2)
         use_float = 1;
 #endif
     } else if (!term_is_integer(arg1)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -490,7 +484,6 @@ static term sub_boxed_helper(Context *ctx, term arg1, term arg2)
         use_float = 1;
 #endif
     } else if (!term_is_integer(arg2)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -526,7 +519,6 @@ static term sub_boxed_helper(Context *ctx, term arg1, term arg2)
                     return make_boxed_int64(ctx, res64);
 
                 #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                    TRACE("overflow: arg1: " AVM_INT64_FMT ", arg2: " AVM_INT64_FMT "\n", arg1, arg2);
                     RAISE_ERROR(OVERFLOW_ATOM);
                 #else
                     #error "Unsupported configuration."
@@ -544,7 +536,6 @@ static term sub_boxed_helper(Context *ctx, term arg1, term arg2)
             avm_int64_t res;
 
             if (BUILTIN_SUB_OVERFLOW_INT64(val1, val2, &res)) {
-                TRACE("overflow: val1: " AVM_INT64_FMT ", val2: " AVM_INT64_FMT "\n", arg1, arg2);
                 RAISE_ERROR(OVERFLOW_ATOM);
             }
 
@@ -610,7 +601,6 @@ static term mul_boxed_helper(Context *ctx, term arg1, term arg2)
         use_float = 1;
 #endif
     } else if (!term_is_integer(arg1)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -621,7 +611,6 @@ static term mul_boxed_helper(Context *ctx, term arg1, term arg2)
         use_float = 1;
 #endif
     } else if (!term_is_integer(arg2)) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -657,7 +646,6 @@ static term mul_boxed_helper(Context *ctx, term arg1, term arg2)
                     return make_boxed_int64(ctx, res64);
 
                 #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                    TRACE("overflow: arg1: " AVM_INT64_FMT ", arg2: " AVM_INT64_FMT "\n", arg1, arg2);
                     RAISE_ERROR(OVERFLOW_ATOM);
                 #else
                     #error "Unsupported configuration."
@@ -675,7 +663,6 @@ static term mul_boxed_helper(Context *ctx, term arg1, term arg2)
             avm_int64_t res;
 
             if (BUILTIN_MUL_OVERFLOW_INT64(val1, val2, &res)) {
-                TRACE("overflow: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
                 RAISE_ERROR(OVERFLOW_ATOM);
             }
 
@@ -712,13 +699,11 @@ static term div_boxed_helper(Context *ctx, term arg1, term arg2)
     if (term_is_boxed_integer(arg1)) {
         size = term_boxed_size(arg1);
     } else if (UNLIKELY(!term_is_integer(arg1))) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
     if (term_is_boxed_integer(arg2)) {
         size |= term_boxed_size(arg2);
     } else if (UNLIKELY(!term_is_integer(arg2))) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 
@@ -739,7 +724,6 @@ static term div_boxed_helper(Context *ctx, term arg1, term arg2)
                     return make_boxed_int64(ctx, -((avm_int64_t) AVM_INT_MIN));
 
                 #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                    TRACE("overflow: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
                     RAISE_ERROR(OVERFLOW_ATOM);
                 #endif
 
@@ -757,7 +741,6 @@ static term div_boxed_helper(Context *ctx, term arg1, term arg2)
                 RAISE_ERROR(BADARITH_ATOM);
 
             } else if (UNLIKELY((val2 == -1) && (val1 == INT64_MIN))) {
-                TRACE("overflow: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
                 RAISE_ERROR(OVERFLOW_ATOM);
 
             } else {
@@ -827,7 +810,6 @@ static term neg_boxed_helper(Context *ctx, term arg1)
                             return make_boxed_int64(ctx, -((avm_int64_t) val));
 
                         #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                            TRACE("overflow: val: " AVM_INT_FMT "\n", val);
                             RAISE_ERROR(OVERFLOW_ATOM);
 
                         #else
@@ -844,7 +826,6 @@ static term neg_boxed_helper(Context *ctx, term arg1)
                 avm_int64_t val = term_unbox_int64(arg1);
 
                 if (val == INT64_MIN) {
-                    TRACE("overflow: arg1: " AVM_INT64_FMT "\n", arg1);
                     RAISE_ERROR(OVERFLOW_ATOM);
 
                 } else {
@@ -856,7 +837,6 @@ static term neg_boxed_helper(Context *ctx, term arg1)
                 RAISE_ERROR(OVERFLOW_ATOM);
         }
     } else {
-        TRACE("error: arg1: 0x%lx\n", arg1);
         RAISE_ERROR(BADARITH_ATOM);
     }
 }
@@ -916,7 +896,6 @@ static term abs_boxed_helper(Context *ctx, term arg1)
                         return make_boxed_int64(ctx, -((avm_int64_t) val));
 
                     #elif BOXED_TERMS_REQUIRED_FOR_INT64 == 1
-                        TRACE("overflow: val: " AVM_INT_FMT "\n", val);
                         RAISE_ERROR(OVERFLOW_ATOM);
 
                     #else
@@ -936,7 +915,6 @@ static term abs_boxed_helper(Context *ctx, term arg1)
                 }
 
                 if (val == INT64_MIN) {
-                    TRACE("overflow: val:" AVM_INT64_FMT "\n", val);
                     RAISE_ERROR(OVERFLOW_ATOM);
 
                 } else {
@@ -948,7 +926,6 @@ static term abs_boxed_helper(Context *ctx, term arg1)
                 RAISE_ERROR(OVERFLOW_ATOM);
         }
     } else {
-        TRACE("error: arg1: 0x%lx\n", arg1);
         RAISE_ERROR(BADARG_ATOM);
     }
 }
@@ -981,13 +958,11 @@ static term rem_boxed_helper(Context *ctx, term arg1, term arg2)
     if (term_is_boxed_integer(arg1)) {
         size = term_boxed_size(arg1);
     } else if (UNLIKELY(!term_is_integer(arg1))) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
     if (term_is_boxed_integer(arg2)) {
         size |= term_boxed_size(arg2);
     } else if (UNLIKELY(!term_is_integer(arg2))) {
-        TRACE("error: arg1: 0x%lx, arg2: 0x%lx\n", arg1, arg2);
         RAISE_ERROR(BADARITH_ATOM);
     }
 

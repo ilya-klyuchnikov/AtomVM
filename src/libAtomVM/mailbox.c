@@ -21,7 +21,6 @@
 #include "mailbox.h"
 #include "memory.h"
 #include "scheduler.h"
-#include "trace.h"
 
 #define ADDITIONAL_PROCESSING_MEMORY_SIZE 4
 
@@ -32,8 +31,6 @@ static inline term *mailbox_message_memory(Message *msg)
 
 void mailbox_send(Context *c, term t)
 {
-    TRACE("Sending 0x%lx to pid %i\n", t, c->process_id);
-
     unsigned long estimated_mem_usage = memory_estimate_usage(t);
 
     Message *m = malloc(sizeof(Message) + estimated_mem_usage * sizeof(term));
@@ -61,16 +58,12 @@ Message *mailbox_dequeue(Context *c)
     Message *m = GET_LIST_ENTRY(list_first(&c->mailbox), Message, mailbox_list_head);
     list_remove(&m->mailbox_list_head);
 
-    TRACE("Pid %i is dequeueing 0x%lx.\n", c->process_id, m->message);
-
     return m;
 }
 
 term mailbox_peek(Context *c)
 {
     Message *m = GET_LIST_ENTRY(list_first(&c->mailbox), Message, mailbox_list_head);
-
-    TRACE("Pid %i is peeking 0x%lx.\n", c->process_id, m->message);
 
     if (c->e - c->heap_ptr < m->msg_memory_size) {
         // ADDITIONAL_PROCESSING_MEMORY_SIZE: ensure some additional memory for message processing, so there is
@@ -88,7 +81,6 @@ term mailbox_peek(Context *c)
 void mailbox_remove(Context *c)
 {
     if (UNLIKELY(list_is_empty(&c->mailbox))) {
-        TRACE("Pid %i tried to remove a message from an empty mailbox.\n", c->process_id);
         return;
     }
 

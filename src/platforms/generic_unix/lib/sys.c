@@ -43,8 +43,6 @@
     typedef Context *(*create_port_t)(GlobalContext *global, term opts);
 #endif
 
-#include "trace.h"
-
 static volatile uint32_t millis;
 static bool has_signal_handler;
 
@@ -143,8 +141,6 @@ void sys_time(struct timespec *t)
 
 Module *sys_load_module(GlobalContext *global, const char *module_name)
 {
-    TRACE("sys_load_module: Going to load: %s\n", module_name);
-
     const void *beam_module = NULL;
     uint32_t beam_module_size = 0;
 

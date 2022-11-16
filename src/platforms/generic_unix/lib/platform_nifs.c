@@ -33,9 +33,6 @@
 #include <openssl/rand.h>
 #endif
 
-//#define ENABLE_TRACE
-#include "trace.h"
-
 #define VALIDATE_VALUE(value, verify_function) \
     if (UNLIKELY(!verify_function((value)))) { \
         argv[0] = ERROR_ATOM;                  \
@@ -139,20 +136,16 @@ const struct Nif *platform_nifs_get_nif(const char *nifname)
 {
 #if defined ATOMVM_HAS_OPENSSL
     if (strcmp("erlang:md5/1", nifname) == 0) {
-        TRACE("Resolved platform nif %s ...\n", nifname);
         return &openssl_md5_nif;
     }
     if (strcmp("atomvm:rand_bytes/1", nifname) == 0) {
-        TRACE("Resolved platform nif %s ...\n", nifname);
         return &openssl_rand_bytes_nif;
     }
     if (strcmp("atomvm:random/0", nifname) == 0) {
-        TRACE("Resolved platform nif %s ...\n", nifname);
         return &openssl_random_nif;
     }
 #endif
     if (strcmp("atomvm:platform/0", nifname) == 0) {
-        TRACE("Resolved platform nif %s ...\n", nifname);
         return &atomvm_platform_nif;
     }
     return NULL;

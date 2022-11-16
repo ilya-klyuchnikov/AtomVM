@@ -54,7 +54,6 @@ set(HEADER_FILES
     term_typedef.h
     term.h
     timer_wheel.h
-    trace.h
     utils.h
     valueshashtable.h
     ${CMAKE_CURRENT_BINARY_DIR}/version.h

@@ -27,10 +27,6 @@
 #include "memory.h"
 #include "tempstack.h"
 
-// #define ENABLE_TRACE
-
-#include "trace.h"
-
 struct RefcBinary *refc_binary_create_refc(size_t size)
 {
     size_t n = sizeof(struct RefcBinary) + size;

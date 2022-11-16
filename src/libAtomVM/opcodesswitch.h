@@ -41,10 +41,6 @@
 #define ENABLE_OTP22
 #define ENABLE_OTP23
 
-//#define ENABLE_TRACE
-
-#include "trace.h"
-
 #define COMPACT_LITERAL 0
 #define COMPACT_SMALLINT4 1
 #define COMPACT_ATOM 2
@@ -464,31 +460,26 @@ typedef union
 
 #define VERIFY_IS_INTEGER(t, opcode_name)                  \
     if (UNLIKELY(!term_is_integer(t))) {                   \
-        TRACE(opcode_name ": " #t " is not an integer\n"); \
         RAISE_ERROR(BADARG_ATOM);                          \
     }
 
 #define VERIFY_IS_ANY_INTEGER(t, opcode_name)               \
     if (UNLIKELY(!term_is_any_integer(t))) {                \
-        TRACE(opcode_name ": " #t " is not any integer\n"); \
         RAISE_ERROR(BADARG_ATOM);                           \
     }
 
 #define VERIFY_IS_BINARY(t, opcode_name)                 \
     if (UNLIKELY(!term_is_binary(t))) {                  \
-        TRACE(opcode_name ": " #t " is not a binary\n"); \
         RAISE_ERROR(BADARG_ATOM);                        \
     }
 
 #define VERIFY_IS_MATCH_STATE(t, opcode_name)                    \
     if (UNLIKELY(!term_is_match_state(t))) {                     \
-        TRACE(opcode_name ": " #t " is not a match context.\n"); \
         RAISE_ERROR(BADARG_ATOM);                                \
     }
 
 #define VERIFY_IS_MATCH_OR_BINARY(t, opcode_name)                          \
     if (UNLIKELY(!(term_is_binary(t) || term_is_match_state(t)))) {        \
-        TRACE(opcode_name ": " #t " is not a binary or match context.\n"); \
         RAISE_ERROR(BADARG_ATOM);                                          \
     }
 
@@ -558,7 +549,6 @@ static int get_catch_label_and_change_module(Context *ctx, Module **mod)
         if (term_is_catch_label(*ct)) {
             int target_module;
             int target_label = term_to_catch_label_and_module(*ct, &target_module);
-            TRACE("- found catch: label: %i, module: %i\n", target_label, target_module);
             *mod = ctx->global->modules_by_index[target_module];
 
             DEBUG_DUMP_STACK(ctx);
@@ -854,13 +844,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
     return false;
 }
 
-#define TRACE_APPLY(...)
-#define TRACE_CALL(...)
-#define TRACE_CALL_EXT(...)
-#define TRACE_RETURN(...)
-#define TRACE_SEND(...)
-#define TRACE_RECEIVE(...)
-
 #endif
 
 #pragma GCC diagnostic push
@@ -887,13 +870,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
     unsigned int i = 0;
 
-    #ifdef IMPL_CODE_LOADER
-        TRACE("-- Loading code\n");
-    #endif
-
     #ifdef IMPL_EXECUTE_LOOP
-        TRACE("-- Executing code\n");
-
         int function_len = strlen(function_name);
         uint8_t *tmp_atom_name = malloc(function_len + 1);
         tmp_atom_name[0] = function_len;
@@ -921,11 +898,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 DECODE_LABEL(label, code, i, next_offset, next_offset)
 
-                TRACE("label/1 label=%i\n", label);
-                USED_BY_TRACE(label);
-
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("Mark label %i here at %i\n", label, i);
                     module_add_label(mod, label, &code[i]);
                 #endif
 
@@ -942,11 +915,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_offset, next_offset);
 
-                TRACE("func_info/3 module_name_a=%i, function_name_a=%i, arity=%i\n", module_atom, function_name_atom, arity);
-                USED_BY_TRACE(function_name_atom);
-                USED_BY_TRACE(module_atom);
-                USED_BY_TRACE(arity);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     RAISE_ERROR(FUNCTION_CLAUSE_ATOM);
                 #endif
@@ -956,10 +924,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_INT_CALL_END: {
-                TRACE("int_call_end!\n");
-
             #ifdef IMPL_CODE_LOADER
-                TRACE("-- Code loading finished --\n");
                 return i;
             #endif
 
@@ -976,16 +941,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_offset, next_offset);
 
-                TRACE("call/2, arity=%i, label=%i\n", arity, label);
-                USED_BY_TRACE(arity);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     NEXT_INSTRUCTION(next_offset);
                     ctx->cp = module_address(mod->module_index, i);
 
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
-                        TRACE_CALL(ctx, mod, "call", label, arity);
                         JUMP_TO_ADDRESS(mod->labels[label]);
                     } else {
                         SCHEDULE_NEXT(mod, mod->labels[label]);
@@ -1008,11 +969,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_offset, next_offset);
 
-                TRACE("call_last/3, arity=%i, label=%i, dellocate=%i\n", arity, label, n_words);
-                USED_BY_TRACE(arity);
-                USED_BY_TRACE(label);
-                USED_BY_TRACE(n_words);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->cp = ctx->e[n_words];
                     ctx->e += (n_words + 1);
@@ -1021,7 +977,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
-                        TRACE_CALL(ctx, mod, "call_last", label, arity);
                         JUMP_TO_ADDRESS(mod->labels[label]);
                     } else {
                         SCHEDULE_NEXT(mod, mod->labels[label]);
@@ -1042,16 +997,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
-                TRACE("call_only/2, arity=%i, label=%i\n", arity, label);
-                USED_BY_TRACE(arity);
-                USED_BY_TRACE(label);
-
                 #ifdef IMPL_EXECUTE_LOOP
 
                     NEXT_INSTRUCTION(next_off);
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
-                        TRACE_CALL(ctx, mod, "call_only", label, arity);
                         JUMP_TO_ADDRESS(mod->labels[label]);
                     } else {
                         SCHEDULE_NEXT(mod, mod->labels[label]);
@@ -1072,11 +1022,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
 
-                TRACE("call_ext/2, arity=%i, index=%i\n", arity, index);
-                USED_BY_TRACE(arity);
-                USED_BY_TRACE(index);
-
-
                 #ifdef IMPL_CODE_LOADER
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -1089,8 +1034,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
 
                     NEXT_INSTRUCTION(next_off);
-
-                    TRACE_CALL_EXT(ctx, mod, "call_ext", index, arity);
 
                     const struct ExportedFunction *func = mod->imported_funcs[index].func;
 
@@ -1141,19 +1084,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_off, next_off);
 
-                TRACE("call_ext_last/3, arity=%i, index=%i, n_words=%i\n", arity, index, n_words);
-                USED_BY_TRACE(arity);
-                USED_BY_TRACE(index);
-                USED_BY_TRACE(n_words);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     remaining_reductions--;
                     if (UNLIKELY(!remaining_reductions)) {
                         SCHEDULE_NEXT(mod, INSTRUCTION_POINTER());
                         continue;
                     }
-
-                    TRACE_CALL_EXT(ctx, mod, "call_ext_last", index, arity);
 
                     ctx->cp = ctx->e[n_words];
                     ctx->e += (n_words + 1);
@@ -1212,13 +1148,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("bif0/2 bif=%i, dreg=%c%i\n", bif, T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(bif);
-                USED_BY_TRACE(dreg);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl0 func = (BifImpl0) mod->imported_funcs[bif].bif;
-                    DEBUG_FAIL_NULL(func);
                     term ret = func(ctx);
 
                     WRITE_REGISTER(dreg_type, dreg, ret);
@@ -1241,17 +1172,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("bif1/2 bif=%i, fail=%i, dreg=%c%i\n", bif, fail_label, T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(bif);
-                USED_BY_TRACE(dreg);
-
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(arg1);
                 #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl1 func = (BifImpl1) mod->imported_funcs[bif].bif;
-                    DEBUG_FAIL_NULL(func);
                     term ret = func(ctx, arg1);
                     if (UNLIKELY(term_is_invalid_term(ret))) {
                         HANDLE_ERROR();
@@ -1279,10 +1205,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("bif2/2 bif=%i, fail=%i, dreg=%c%i\n", bif, fail_label, T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(bif);
-                USED_BY_TRACE(dreg);
-
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(arg1);
                     UNUSED(arg2);
@@ -1290,7 +1212,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl2 func = (BifImpl2) mod->imported_funcs[bif].bif;
-                    DEBUG_FAIL_NULL(func);
                     term ret = func(ctx, arg1, arg2);
                     if (UNLIKELY(term_is_invalid_term(ret))) {
                         HANDLE_ERROR();
@@ -1309,9 +1230,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(stack_need, code, i, next_off, next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
-                TRACE("allocate/2 stack_need=%i, live=%i\n" , stack_need, live);
-                USED_BY_TRACE(stack_need);
-                USED_BY_TRACE(live);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (live > ctx->avail_registers) {
@@ -1342,10 +1260,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(heap_need, code, i, next_off, next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
-                TRACE("allocate_heap/2 stack_need=%i, heap_need=%i, live=%i\n", stack_need, heap_need, live);
-                USED_BY_TRACE(stack_need);
-                USED_BY_TRACE(heap_need);
-                USED_BY_TRACE(live);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (live > ctx->avail_registers) {
@@ -1374,9 +1288,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(stack_need, code, i, next_off, next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
-                TRACE("allocate_zero/2 stack_need=%i, live=%i\n", stack_need, live);
-                USED_BY_TRACE(stack_need);
-                USED_BY_TRACE(live);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (live > ctx->avail_registers) {
@@ -1411,10 +1322,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(heap_need, code, i, next_off, next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
-                TRACE("allocate_heap_zero/3 stack_need=%i, heap_need=%i, live=%i\n", stack_need, heap_need, live);
-                USED_BY_TRACE(stack_need);
-                USED_BY_TRACE(heap_need);
-                USED_BY_TRACE(live);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (live > ctx->avail_registers) {
@@ -1447,10 +1354,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int live_registers;
                 DECODE_INTEGER(live_registers, code, i, next_offset, next_offset);
 
-                TRACE("test_heap/2 heap_need=%i, live_registers=%i\n", heap_need, live_registers);
-                USED_BY_TRACE(heap_need);
-                USED_BY_TRACE(live_registers);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     size_t heap_free = context_avail_free_memory(ctx);
                     // if we need more heap space than is currently free, then try to GC the needed space
@@ -1464,7 +1367,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else if (heap_free > heap_need * HEAP_NEED_GC_SHRINK_THRESHOLD_COEFF) {
                         context_clean_registers(ctx, live_registers);
                         if (UNLIKELY(memory_ensure_free(ctx, heap_need * (HEAP_NEED_GC_SHRINK_THRESHOLD_COEFF / 2)) != MEMORY_GC_OK)) {
-                            TRACE("Unable to ensure free memory.  heap_need=%i\n", heap_need);
                             RAISE_ERROR(OUT_OF_MEMORY_ATOM);
                         }
                     }
@@ -1478,8 +1380,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 int target;
                 DECODE_INTEGER(target, code, i, next_offset, next_offset);
-
-                TRACE("kill/1 target=%i\n", target);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->e[target] = term_nil();
@@ -1495,9 +1395,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_off, next_off);
 
-                TRACE("deallocate/1 n_words=%i\n", n_words);
-                USED_BY_TRACE(n_words);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     DEBUG_DUMP_STACK(ctx);
 
@@ -1511,11 +1408,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_RETURN: {
-                TRACE("return/0\n");
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE_RETURN(ctx);
-
                     if ((long) ctx->cp == -1) {
                         return 0;
                     }
@@ -1531,14 +1424,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             //TODO: implement send/0
             case OP_SEND: {
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("send/0\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     int local_process_id = term_to_local_process_id(ctx->x[0]);
-                    TRACE("send/0 target_pid=%i\n", local_process_id);
-                    TRACE_SEND(ctx, ctx->x[0], ctx->x[1]);
                     Context *target = globalcontext_get_process(ctx->global, local_process_id);
                     if (!IS_NULL_PTR(target)) {
                         mailbox_send(target, ctx->x[1]);
@@ -1552,8 +1439,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_REMOVE_MESSAGE: {
-                TRACE("remove_message/0\n");
-
                 #ifdef IMPL_EXECUTE_LOOP
                     if (ctx->flags & (WaitingTimeout | WaitingTimeoutExpired)) {
                         scheduler_cancel_timeout(ctx);
@@ -1573,8 +1458,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_TIMEOUT: {
-                TRACE("timeout/0\n");
-
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->flags &= ~WaitingTimeoutExpired;
 
@@ -1598,15 +1481,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("loop_rec/2, dreg=%c%i\n", T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(dreg);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     if (list_is_empty(&ctx->mailbox)) {
                         JUMP_TO_ADDRESS(mod->labels[label]);
                     } else {
                         term ret = mailbox_peek(ctx);
-                        TRACE_RECEIVE(ctx, ret);
 
                         WRITE_REGISTER(dreg_type, dreg, ret);
                         NEXT_INSTRUCTION(next_off);
@@ -1625,9 +1504,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_offset, next_offset);
 
-                TRACE("loop_rec_end/1 label=%i\n", label);
-                USED_BY_TRACE(label);
-
 #ifdef IMPL_EXECUTE_LOOP
                 struct ListHead *msg = list_first(&ctx->mailbox);
                 list_remove(msg);
@@ -1645,8 +1521,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
-
-                TRACE("wait/1\n");
 
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->saved_ip = mod->labels[label];
@@ -1680,7 +1554,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     if (!term_is_integer(timeout) && UNLIKELY(timeout != INFINITY_ATOM)) {
                         RAISE_ERROR(TIMEOUT_VALUE_ATOM);
                     }
-                    TRACE("wait_timeout/2, label: %i, timeout: %li\n", label, (long int) term_to_int32(timeout));
 
                     NEXT_INSTRUCTION(next_off);
                     //TODO: it looks like x[0] might be used instead of jump_to_on_restore
@@ -1711,8 +1584,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("wait_timeout/2, label: %i\n", label);
-
                     UNUSED(timeout)
 
                     NEXT_INSTRUCTION(next_off);
@@ -1731,8 +1602,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_lt/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     if (term_compare(arg1, arg2, ctx) < 0) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -1741,7 +1610,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_lt/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1760,8 +1628,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_ge/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     if (term_compare(arg1, arg2, ctx) >= 0) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -1770,7 +1636,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_ge/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1789,8 +1654,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_equal/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     //TODO: implement this
                     if (term_equals(arg1, arg2, ctx)) {
                         NEXT_INSTRUCTION(next_off);
@@ -1800,7 +1663,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_equal/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1819,8 +1681,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_not_equal/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     if (!term_equals(arg1, arg2, ctx)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -1829,7 +1689,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_not_equal/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1848,8 +1707,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_eq_exact/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     //TODO: implement this
                     if (term_exactly_equals(arg1, arg2, ctx)) {
                         NEXT_INSTRUCTION(next_off);
@@ -1859,7 +1716,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_eq_exact/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1878,8 +1734,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_not_eq_exact/2, label=%i, arg1=%lx, arg2=%lx\n", label, arg1, arg2);
-
                     //TODO: implement this
                     if (!term_exactly_equals(arg1, arg2, ctx)) {
                         NEXT_INSTRUCTION(next_off);
@@ -1889,7 +1743,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_not_eq_exact/2\n");
                     UNUSED(arg1)
                     UNUSED(arg2)
                     NEXT_INSTRUCTION(next_off);
@@ -1906,8 +1759,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_integer/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_any_integer(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -1916,7 +1767,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_integer/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -1933,8 +1783,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_float/2, label=%i, arg1=%lx\n", label, arg1);
-
 #ifndef AVM_NO_FP
                     if (term_is_float(arg1)) {
                         NEXT_INSTRUCTION(next_off);
@@ -1948,7 +1796,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_float/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -1965,8 +1812,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_number/2, label=%i, arg1=%lx\n", label, arg1);
-
                     //TODO: check for floats too
                     if (term_is_number(arg1)) {
                         NEXT_INSTRUCTION(next_off);
@@ -1976,7 +1821,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_number/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -1993,8 +1837,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_binary/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_binary(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2003,7 +1845,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_binary/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2019,8 +1860,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_list/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_list(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2029,7 +1868,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_list/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2045,8 +1883,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_nonempty_list/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_nonempty_list(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2055,7 +1891,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_nonempty_list/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2071,8 +1906,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_nil/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_nil(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2081,7 +1914,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_nil/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2097,8 +1929,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_atom/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_atom(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2107,7 +1937,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_atom/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2123,8 +1952,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_pid/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_pid(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2133,7 +1960,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_pid/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2149,8 +1975,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_reference/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_reference(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2159,7 +1983,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_reference/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2175,8 +1998,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_port/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_pid(arg1)) {
                         int local_process_id = term_to_local_process_id(arg1);
                         Context *target = globalcontext_get_process(ctx->global, local_process_id);
@@ -2192,7 +2013,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_port/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2208,8 +2028,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_tuple/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_tuple(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2218,7 +2036,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_tuple/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -2237,8 +2054,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(arity, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("test_arity/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_tuple(arg1) && term_get_tuple_arity(arg1) == arity) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2247,7 +2062,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("test_arity/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -2265,10 +2079,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
-
-                TRACE("select_val/3, default_label=%i, vals=%i\n", default_label, size);
-                USED_BY_TRACE(default_label);
-                USED_BY_TRACE(size);
 
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(src_value);
@@ -2319,10 +2129,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
-
-                TRACE("select_tuple_arity/3, default_label=%i, vals=%i\n", default_label, size);
-                USED_BY_TRACE(default_label);
-                USED_BY_TRACE(size);
 
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(src_value);
@@ -2378,9 +2184,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 DECODE_LABEL(label, code, i, next_offset, next_offset)
 
-                TRACE("jump/1 label=%i\n", label);
-                USED_BY_TRACE(label);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
@@ -2406,13 +2209,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("move/2 %lx, %c%i\n", src_value, T_DEST_REG(dreg_type, dreg));
-
                     WRITE_REGISTER(dreg_type, dreg, src_value);
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("move/2\n");
                     UNUSED(src_value)
                 #endif
 
@@ -2432,8 +2232,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("get_list/3 %lx, %c%i, %c%i\n", src_value, T_DEST_REG(head_dreg_type, head_dreg), T_DEST_REG(tail_dreg_type, tail_dreg));
-
                     term head = term_get_list_head(src_value);
                     term tail = term_get_list_tail(src_value);
 
@@ -2442,7 +2240,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("get_list/2\n");
                     UNUSED(src_value)
                 #endif
 
@@ -2459,9 +2256,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
-
-                TRACE("get_tuple_element/2, element=%i, dest=%c%i\n", element, T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(element);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (UNLIKELY(!term_is_tuple(src_value) || (element < 0) || (element >= term_get_tuple_arity(src_value)))) {
@@ -2488,8 +2282,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(tuple, code, i, next_off, next_off);
                 int position;
                 DECODE_INTEGER(position, code, i, next_off, next_off);
-
-                TRACE("set_tuple_element/2\n");
 
 #ifdef IMPL_EXECUTE_LOOP
                 if (UNLIKELY(!term_is_tuple(tuple) || (position < 0) || (position >= term_get_tuple_arity(tuple)))) {
@@ -2523,8 +2315,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term *list_elem = term_list_alloc(ctx);
 #endif
 
-                TRACE("op_put_list/3\n");
-
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(head);
                     UNUSED(tail);
@@ -2547,9 +2337,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("put_tuple/2 size=%i, dest=%c%i\n", size, T_DEST_REG(dreg_type, dreg));
-                USED_BY_TRACE(dreg);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     term t = term_alloc_tuple(size, ctx);
                     WRITE_REGISTER(dreg_type, dreg, t);
@@ -2564,12 +2351,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     term put_value;
                     DECODE_COMPACT_TERM(put_value, code, i, next_off, next_off);
                     #ifdef IMPL_CODE_LOADER
-                        TRACE("put/2\n");
                         UNUSED(put_value);
                     #endif
 
                     #ifdef IMPL_EXECUTE_LOOP
-                        TRACE("put/2 elem=%i, value=0x%lx\n", j, put_value);
                         term_put_tuple_element(t, j, put_value);
                     #endif
                 }
@@ -2589,14 +2374,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("badmatch/1\n");
-                    USED_BY_TRACE(arg1);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("badmatch/1, v=0x%lx\n", arg1);
-
                     term new_error_tuple = term_alloc_tuple(2, ctx);
                     //TODO: check alloc
                     term_put_tuple_element(new_error_tuple, 0, BADMATCH_ATOM);
@@ -2613,8 +2391,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IF_END: {
-                TRACE("if_end/0\n");
-
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->x[0] = ERROR_ATOM;
                     ctx->x[1] = IF_CLAUSE_ATOM;
@@ -2640,14 +2416,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("case_end/1\n");
-                    USED_BY_TRACE(arg1);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("case_end/1, v=0x%lx\n", arg1);
-
                     term new_error_tuple = term_alloc_tuple(2, ctx);
                     //TODO: reserve memory before
                     term_put_tuple_element(new_error_tuple, 0, CASE_CLAUSE_ATOM);
@@ -2667,9 +2436,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 unsigned int args_count;
                 DECODE_INTEGER(args_count, code, i, next_off, next_off)
-
-                TRACE("call_fun/1, args_count=%i\n", args_count);
-                USED_BY_TRACE(args_count);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     remaining_reductions--;
@@ -2732,8 +2498,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                         module_get_fun(fun_module, fun_index, &label, &fun_arity_and_freeze, &n_freeze);
 
                         fun_arity = fun_arity_and_freeze - n_freeze;
-
-                        TRACE_CALL(ctx, mod, "call_fun", label, args_count);
                     }
 
                     if (UNLIKELY(args_count != fun_arity)) {
@@ -2767,8 +2531,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_function/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_function(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -2777,7 +2539,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_function/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -2793,10 +2554,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
 
-                TRACE("call_ext_only/2, arity=%i, index=%i\n", arity, index);
-                USED_BY_TRACE(arity);
-                USED_BY_TRACE(index);
-
                 #ifdef IMPL_CODE_LOADER
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -2807,8 +2564,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                         SCHEDULE_NEXT(mod, INSTRUCTION_POINTER());
                         continue;
                     }
-
-                    TRACE_CALL_EXT(ctx, mod, "call_ext_only", index, arity);
 
                     const struct ExportedFunction *func = mod->imported_funcs[index].func;
 
@@ -2860,7 +2615,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int fun_index;
                 DECODE_LABEL(fun_index, code, i, next_off, next_off)
 
-                TRACE("make_fun/2, fun_index=%i\n", fun_index);
                 #ifdef IMPL_EXECUTE_LOOP
                     term f = make_fun(ctx, mod, fun_index);
                     if (term_is_invalid_term(f)) {
@@ -2882,8 +2636,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
-                TRACE("try/2, label=%i, reg=%c%i\n", label, T_DEST_REG(dreg_type, dreg));
-
                 #ifdef IMPL_EXECUTE_LOOP
                     term catch_term = term_from_catch_label(mod->module_index, label);
                     //TODO: here just write to y registers is enough
@@ -2900,8 +2652,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                TRACE("try_end/1, reg=%c%i\n", T_DEST_REG(dreg_type, dreg));
-
                 #ifdef IMPL_EXECUTE_LOOP
                     //TODO: here just write to y registers is enough
                     WRITE_REGISTER(dreg_type, dreg, term_nil());
@@ -2916,8 +2666,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
-
-                TRACE("try_case/1, reg=%c%i\n", T_DEST_REG(dreg_type, dreg));
 
                 #ifdef IMPL_EXECUTE_LOOP
                     // clears the catch value on stack
@@ -2940,13 +2688,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("try_case_end/1\n");
                     UNUSED(arg1);
                 #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("try_case_end/1, val=%lx\n", arg1);
-
                     term new_error_tuple = term_alloc_tuple(2, ctx);
                     //TODO: ensure memory before
                     term_put_tuple_element(new_error_tuple, 0, TRY_CLAUSE_ATOM);
@@ -2968,13 +2713,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(exc_value, code, i, next_off, next_off);
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("raise/2\n");
                     UNUSED(exc_value);
                 #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("raise/2 stacktrace=0x%lx exc_value=0x%lx\n", stacktrace, exc_value);
-
                     RAISE_ERROR(exc_value);
                 #endif
 
@@ -2989,8 +2731,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
-
-                TRACE("catch/2, label=%i, reg=%c%i\n", label, T_DEST_REG(dreg_type, dreg));
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term catch_term = term_from_catch_label(mod->module_index, label);
@@ -3007,8 +2747,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
-
-                TRACE("catch_end/1, reg=%c%i\n", T_DEST_REG(dreg_type, dreg));
 
                 #ifdef IMPL_EXECUTE_LOOP
                     // TODO: here just write to y registers is enough
@@ -3065,17 +2803,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_add/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(src1, "bs_add");
                     VERIFY_IS_INTEGER(src2, "bs_add");
                     avm_int_t src1_val = term_to_int(src1);
                     avm_int_t src2_val = term_to_int(src2);
-
-                    TRACE("bs_add/5, fail=%i src1=%li src2=%li unit=%li dreg=%c%i\n", fail, src1_val, src2_val, unit, T_DEST_REG(dreg_type, dreg));
 
                     WRITE_REGISTER(dreg_type, dreg, term_from_int((src1_val + src2_val) * unit));
                 #endif
@@ -3102,15 +2834,9 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_init2/6\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(size, "bs_init2");
                     avm_int_t size_val = term_to_int(size);
-
-                    TRACE("bs_init2/6, fail=%i size=%li words=%li regs=%li dreg=%c%i\n", fail, size_val, words, regs, T_DEST_REG(dreg_type, dreg));
 
                     if (UNLIKELY(memory_ensure_free(ctx, term_binary_data_size_in_terms(size_val) + BINARY_HEADER_SIZE) != MEMORY_GC_OK)) {
                         RAISE_ERROR(OUT_OF_MEMORY_ATOM);
@@ -3143,25 +2869,17 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_init_bits/6\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(size, "bs_init_bits");
                     VERIFY_IS_INTEGER(flags, "bs_init_bits");
                     avm_int_t size_val = term_to_int(size);
                     if (size_val % 8 != 0) {
-                        TRACE("bs_init_bits: size_val (%li) is not evenly divisible by 8\n", size_val);
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     avm_int_t flags_value = term_to_int(flags);
                     if (flags_value != 0) {
-                        TRACE("bs_init_bits: neither signed nor native or little endian encoding supported.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
-
-                    TRACE("bs_init_bits/6, fail=%i size=%li words=%i regs=%i dreg=%c%i\n", fail, size_val, words, regs, T_DEST_REG(dreg_type, dreg));
 
                     if (UNLIKELY(memory_ensure_free(ctx, term_binary_data_size_in_terms(size_val / 8) + BINARY_HEADER_SIZE) != MEMORY_GC_OK)) {
                         RAISE_ERROR(OUT_OF_MEMORY_ATOM);
@@ -3202,10 +2920,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_append/6\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_BINARY(src, "bs_append");
                     VERIFY_IS_INTEGER(size, "bs_append");
@@ -3214,15 +2928,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     avm_int_t extra_val = term_to_int(extra);
 
                     if (size_val % 8 != 0) {
-                        TRACE("bs_append: size_val (%li) is not evenly divisible by 8\n", size_val);
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     if (unit != 8) {
-                        TRACE("bs_append: unit is not equal to 8; unit=%li\n", unit);
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
-
-                    TRACE("bs_append/7, fail=%i size=%li unit=%li src=0x%lx dreg=%c%i\n", fail, size_val, unit, src, T_DEST_REG(dreg_type, dreg));
 
                     size_t src_size = term_binary_size(src);
                     // TODO: further investigate extra_val
@@ -3256,10 +2966,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_put_integer/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_ANY_INTEGER(src, "bs_put_integer");
                     VERIFY_IS_INTEGER(size, "bs_put_integer");
@@ -3269,15 +2975,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     avm_int_t size_value = term_to_int(size);
                     avm_int_t flags_value = term_to_int(flags);
                     if (unit != 1) {
-                        TRACE("bs_put_integer: unit is not 1\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
 
-                    TRACE("bs_put_integer/5, fail=%i size=%li unit=%li flags=0x%lx src=%i\n", fail, size_value, unit, flags_value, (unsigned int) src_value);
-
                     bool result = bitstring_insert_integer(ctx->bs, ctx->bs_offset, src_value, size_value, flags_value);
                     if (UNLIKELY(!result)) {
-                        TRACE("bs_put_integer: Failed to insert integer into binary: %i\n", result);
                         RAISE_ERROR(BADARG_ATOM);
                     }
 
@@ -3300,10 +3002,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_put_binary/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_BINARY(src, "bs_put_binary");
                     VERIFY_IS_INTEGER(flags, "bs_put_binary");
@@ -3311,36 +3009,28 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     if (term_is_integer(size)) {
                         avm_int_t bit_size = term_to_int(size) * unit;
                         if (bit_size % 8 != 0) {
-                            TRACE("bs_put_binary: Bit size must be evenly divisible by 8.\n");
                             RAISE_ERROR(UNSUPPORTED_ATOM);
                         }
                         size_val = bit_size / 8;
                     } else if (size == ALL_ATOM) {
                         size_val = term_binary_size(src);
                     } else {
-                        TRACE("bs_put_binary: Unsupported size term type in put binary: 0x%x\n", size);
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     if (size_val > term_binary_size(src)) {
-                        TRACE("bs_put_binary: binary data size (%li) larger than source binary size (%li)\n", size_val, term_binary_size(src));
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     avm_int_t flags_value = term_to_int(flags);
                     if (flags_value != 0) {
-                        TRACE("bs_put_binary: neither signed nor native or little endian encoding supported.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
 
                     if (ctx->bs_offset % 8 != 0) {
-                        TRACE("bs_put_binary: Unsupported bit syntax operation.  Writing binaries must be byte-aligend.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
 
-                    TRACE("bs_put_binary/5, fail=%i size=%li unit=%li flags=0x%lx src=0x%x\n", fail, size_val, unit, flags, (unsigned int) src);
-
                     int result = term_bs_insert_binary(ctx->bs, ctx->bs_offset, src, size_val);
                     if (UNLIKELY(result)) {
-                        TRACE("bs_put_binary: Failed to insert binary into binary: %i\n", result);
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     ctx->bs_offset += 8 * size_val;
@@ -3356,24 +3046,17 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 avm_int_t offset;
                 DECODE_INTEGER(offset, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_put_string/2\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     if (UNLIKELY(!term_is_binary(ctx->bs))) {
-                        TRACE("bs_put_binary: Bad state.  ctx->bs is not a binary.\n");
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     if (ctx->bs_offset % 8 != 0) {
-                        TRACE("bs_put_string: Unsupported bit syntax operation.  Writing strings must be byte-aligend.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
 
                     size_t remaining = 0;
                     const uint8_t *str = module_get_str(mod, offset, &remaining);
                     if (UNLIKELY(IS_NULL_PTR(str))) {
-                        TRACE("bs_put_binary: Bad offset in strings table.\n");
                         RAISE_ERROR(BADARG_ATOM);
                     }
 
@@ -3411,12 +3094,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     DECODE_COMPACT_TERM(src, code, i, next_off_back, next_off_back);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_start_match2/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("bs_start_match2/5, fail=%i src=0x%lx arg2=0x%lx arg3=0x%lx dreg=%c%i\n", fail, src, arg2, slots_term, T_DEST_REG(dreg_type, dreg));
                     if (!(term_is_binary(src) || term_is_match_state(src))) {
                         WRITE_REGISTER(dreg_type, dreg, src);
                         i = POINTER_TO_II(mod->labels[fail]);
@@ -3452,12 +3130,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_start_match3/4\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("bs_start_match3/4, fail=%i src=0x%lx live=0x%lx dreg=%c%i\n", fail, src, live, T_DEST_REG(dreg_type, dreg));
                     if (!(term_is_binary(src) || term_is_match_state(src))) {
                         WRITE_REGISTER(dreg_type, dreg, src);
                         i = POINTER_TO_II(mod->labels[fail]);
@@ -3485,14 +3158,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_get_position/3\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_position");
-
-                    TRACE("bs_get_position/3 src=0x%lx dreg=%c%i live=0x%lx \n", src, T_DEST_REG(dreg_type, dreg), live);
 
                     avm_int_t offset = term_get_match_state_offset(src);
                     term offset_term = term_from_int(offset);
@@ -3515,24 +3182,18 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_get_tail/3\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_tail");
 
                     avm_int_t bs_offset = term_get_match_state_offset(src);
                     term bs_bin = term_get_match_state_binary(src);
 
-                    TRACE("bs_get_tail/3 src=0x%lx dreg=%c%i live=0x%lx \n", src, T_DEST_REG(dreg_type, dreg), live);
                     if (bs_offset == 0) {
 
                         WRITE_REGISTER(dreg_type, dreg, bs_bin);
 
                     } else {
                         if (bs_offset % 8 != 0) {
-                            TRACE("bs_get_tail: Unsupported alignment.\n");
                             RAISE_ERROR(UNSUPPORTED_ATOM);
                         } else {
                             size_t start_pos = bs_offset / 8;
@@ -3564,16 +3225,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term pos;
                 DECODE_COMPACT_TERM(pos, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_set_position/2\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_set_position");
                     VERIFY_IS_INTEGER(pos, "bs_set_position");
 
                     avm_int_t pos_val = term_to_int(pos);
-                    TRACE("bs_set_position/2 src=0x%lx pos=%li\n", src, pos_val);
                     term_set_match_state_offset(src,  pos_val);
                 #endif
 
@@ -3592,15 +3248,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 avm_int_t offset;
                 DECODE_INTEGER(offset, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_match_string/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_match_string");
 
                     if (bits % 8 != 0) {
-                        TRACE("bs_match_string: Unsupported bits size (must be evenly divisible by 8). bits=%li\n", bits);
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     avm_int_t bytes = bits / 8;
@@ -3608,21 +3259,16 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     term bs_bin = term_get_match_state_binary(src);
 
                     if (bs_offset % 8 != 0) {
-                        TRACE("bs_match_string: Unsupported offset (must be evenly divisible by 8). bs_offset=%li\n", bs_offset);
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     avm_int_t byte_offset = bs_offset / 8;
 
-                    TRACE("bs_match_string/4, fail=%i src=0x%lx bits=%li offset=%li src=0x%lx\n", fail, src, bits, offset, src);
-
                     size_t remaining = 0;
                     const uint8_t *str = module_get_str(mod, offset, &remaining);
                     if (UNLIKELY(IS_NULL_PTR(str))) {
-                        TRACE("bs_match_string: Bad offset in strings table.\n");
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     if (memcmp(term_binary_data(bs_bin) + byte_offset, str, MIN(remaining, (unsigned int) bytes)) != 0) {
-                        TRACE("bs_match_string: failed to match\n");
                         JUMP_TO_ADDRESS(mod->labels[fail]);
                     } else {
                         term_set_match_state_offset(src, bs_offset + bits);
@@ -3643,10 +3289,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term index = 0;
                 DECODE_COMPACT_TERM(index, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_save2/2\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_save2");
 
@@ -3660,8 +3302,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         AVM_ABORT();
                     }
-
-                    TRACE("bs_save2/2, src=0x%lx pos=%li\n", src, index_val);
                 #endif
 
                 NEXT_INSTRUCTION(next_off);
@@ -3675,10 +3315,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term index = 0;
                 DECODE_COMPACT_TERM(index, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_restore2/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_restore2");
 
@@ -3691,8 +3327,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         AVM_ABORT();
                     }
-
-                    TRACE("bs_restore2/2, src=0x%lx pos=%li\n", src, index_val);
                 #endif
 
                 NEXT_INSTRUCTION(next_off);
@@ -3712,28 +3346,20 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term flags;
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_skip_bits2/5\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_skip_bits2");
                     VERIFY_IS_INTEGER(size, "bs_skip_bits2");
                     VERIFY_IS_INTEGER(flags, "bs_skip_bits2");
                     avm_int_t flags_value = term_to_int(flags);
                     if (flags_value != 0) {
-                        TRACE("bs_skip_bits2: neither signed nor native or little endian encoding supported.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     avm_int_t size_val = term_to_int(size);
-
-                    TRACE("bs_skip_bits2/5, fail=%i src=0x%lx size=0x%lx unit=0x%lx flags=0x%lx\n", fail, src, size, unit, flags);
 
                     size_t increment = size_val * unit;
                     avm_int_t bs_offset = term_get_match_state_offset(src);
                     term bs_bin = term_get_match_state_binary(src);
                     if ((bs_offset + increment) > term_binary_size(bs_bin) * 8) {
-                        TRACE("bs_skip_bits2: Insufficient capacity to skip bits: %i, inc: %i\n", bs_offset, increment);
                         JUMP_TO_ADDRESS(mod->labels[fail]);
                     } else {
                         term_set_match_state_offset(src, bs_offset + increment);
@@ -3756,18 +3382,11 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 avm_int_t unit;
                 DECODE_INTEGER(unit, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_test_unit/3\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_test_unit");
 
-                    TRACE("bs_test_unit/3, fail=%i src=0x%lx unit=0x%lx\n", fail, src, unit);
-
                     avm_int_t bs_offset = term_get_match_state_offset(src);
                     if ((term_binary_size(src) * 8 - bs_offset) % unit != 0) {
-                        TRACE("bs_test_unit: Available bits in source not evenly divisible by unit");
                         JUMP_TO_ADDRESS(mod->labels[fail]);
                     } else {
                         NEXT_INSTRUCTION(next_off);
@@ -3788,20 +3407,13 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 avm_int_t bits;
                 DECODE_INTEGER(bits, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_test_tail2/3\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_test_tail2");
-
-                    TRACE("bs_test_tail2/3, fail=%i src=0x%lx bits=0x%lx\n", fail, src, bits);
 
                     term bs_bin = term_get_match_state_binary(src);
                     avm_int_t bs_offset = term_get_match_state_offset(src);
 
                     if ((term_binary_size(bs_bin) * 8 - bs_offset) != (unsigned int) bits) {
-                        TRACE("bs_test_tail2: Expected exactly %li bits remaining, but remaining=%li\n", bits, term_binary_size(bs_bin) * 8 - bs_offset);
                         JUMP_TO_ADDRESS(mod->labels[fail]);
                     } else {
                         NEXT_INSTRUCTION(next_off);
@@ -3831,10 +3443,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_get_integer2/7\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_integer");
                     VERIFY_IS_INTEGER(size,     "bs_get_integer");
@@ -3843,15 +3451,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     avm_int_t size_val = term_to_int(size);
                     avm_int_t flags_value = term_to_int(flags);
 
-                    TRACE("bs_get_integer2/7, fail=%i src=0x%lx size=%li unit=%li flags=%li\n", fail, src, size_val, unit, flags);
-
                     avm_int_t increment = size_val * unit;
                     union maybe_unsigned_int64 value;
                     term bs_bin = term_get_match_state_binary(src);
                     avm_int_t bs_offset = term_get_match_state_offset(src);
                     bool status = bitstring_extract_integer(bs_bin, bs_offset, increment, flags_value, &value);
                     if (UNLIKELY(!status)) {
-                        TRACE("bs_get_integer2: error extracting integer.\n");
                         JUMP_TO_ADDRESS(mod->labels[fail]);
                     } else {
                         term_set_match_state_offset(src, bs_offset + increment);
@@ -3890,10 +3495,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_get_binary2/7\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_binary2");
                     VERIFY_IS_INTEGER(flags,    "bs_get_binary2");
@@ -3902,7 +3503,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     avm_int_t bs_offset = term_get_match_state_offset(src);
 
                     if (unit != 8) {
-                        TRACE("bs_get_binary2: Unsupported: unit must be 8.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
                     avm_int_t size_val = 0;
@@ -3911,23 +3511,17 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else if (size == ALL_ATOM) {
                         size_val = term_binary_size(bs_bin) - bs_offset / 8;
                     } else {
-                        TRACE("bs_get_binary2: size is neither an integer nor the atom `all`\n");
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     if (bs_offset % unit != 0) {
-                        TRACE("bs_get_binary2: Unsupported.  Offset on binary read must be aligned on byte boundaries.\n");
                         RAISE_ERROR(BADARG_ATOM);
                     }
                     avm_int_t flags_value = term_to_int(flags);
                     if (flags_value != 0) {
-                        TRACE("bs_get_binary2: neither signed nor native or little endian encoding supported.\n");
                         RAISE_ERROR(UNSUPPORTED_ATOM);
                     }
 
-                    TRACE("bs_get_binary2/7, fail=%i src=0x%lx unit=%li\n", fail, bs_bin, unit);
-
                 if ((unsigned int) (bs_offset / unit + size_val) > term_binary_size(bs_bin)) {
-                    TRACE("bs_get_binary2: insufficient capacity\n");
                     JUMP_TO_ADDRESS(mod->labels[fail]);
                 } else {
                     term_set_match_state_offset(src, bs_offset + size_val * unit);
@@ -3962,13 +3556,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 // Do not check if dreg is a binary or not
                 // In case it is not a binary or a match state, dreg will not be changed.
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_context_to_binary/1\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("bs_context_to_binary/1, dreg=%c%i\n", T_DEST_REG(dreg_type, dreg));
-
                     term src = READ_DEST_REGISTER(dreg_type, dreg);
                     term bin;
                     if (term_is_match_state(src)) {
@@ -4004,7 +3592,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #ifdef IMPL_EXECUTE_LOOP
                 term module = ctx->x[arity];
                 term function = ctx->x[arity + 1];
-                TRACE("apply/1, module=%lu, function=%lu arity=%i\n", module, function, arity);
 
                 remaining_reductions--;
                 if (UNLIKELY(!remaining_reductions)) {
@@ -4019,8 +3606,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                 AtomString module_name = globalcontext_atomstring_from_term(mod->global, module);
                 AtomString function_name = globalcontext_atomstring_from_term(mod->global, function);
-
-                TRACE_APPLY(ctx, "apply", module_name, function_name, arity);
 
                 term native_return;
                 if (maybe_call_native(ctx, module_name, function_name, arity, &native_return)) {
@@ -4045,7 +3630,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 }
 #endif
 #ifdef IMPL_CODE_LOADER
-                TRACE("apply/1 arity=%i\n", arity);
                 NEXT_INSTRUCTION(next_off);
 #endif
                 break;
@@ -4060,7 +3644,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #ifdef IMPL_EXECUTE_LOOP
                 term module = ctx->x[arity];
                 term function = ctx->x[arity + 1];
-                TRACE("apply_last/1, module=%lu, function=%lu arity=%i deallocate=%i\n", module, function, arity, n_words);
 
                 remaining_reductions--;
                 if (UNLIKELY(!remaining_reductions)) {
@@ -4077,8 +3660,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                 AtomString module_name = globalcontext_atomstring_from_term(mod->global, module);
                 AtomString function_name = globalcontext_atomstring_from_term(mod->global, function);
-
-                TRACE_APPLY(ctx, "apply_last", module_name, function_name, arity);
 
                 term native_return;
                 if (maybe_call_native(ctx, module_name, function_name, arity, &native_return)) {
@@ -4103,7 +3684,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 }
 #endif
 #ifdef IMPL_CODE_LOADER
-                TRACE("apply_last/1 arity=%i deallocate=%i\n", arity, n_words);
                 NEXT_INSTRUCTION(next_off);
 #endif
                 break;
@@ -4117,8 +3697,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_boolean/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if ((arg1 == TRUE_ATOM) || (arg1 == FALSE_ATOM)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -4127,7 +3705,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_boolean/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -4146,8 +3723,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(arity, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_function2/3, label=%i, arg1=%lx, arity=%i\n", label, arg1, arity);
-
                     if (term_is_function(arg1)) {
                         const term *boxed_value = term_to_const_term_ptr(arg1);
 
@@ -4181,7 +3756,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_function/3\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -4205,8 +3779,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("gc_bif1/5 fail_lbl=%i, live=%i, bif=%i, arg1=0x%lx, dest=%c%i\n", f_label, live, bif, arg1, T_DEST_REG(dreg_type, dreg));
-
                     GCBifImpl1 func = (GCBifImpl1) mod->imported_funcs[bif].bif;
                     term ret = func(ctx, live, arg1);
                     if (UNLIKELY(term_is_invalid_term(ret))) {
@@ -4217,8 +3789,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("gc_bif1/5\n");
-
                     UNUSED(f_label)
                     UNUSED(live)
                     UNUSED(bif)
@@ -4249,8 +3819,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("gc_bif2/6 fail_lbl=%i, live=%i, bif=%i, arg1=0x%lx, arg2=0x%lx, dest=%c%i\n", f_label, live, bif, arg1, arg2, T_DEST_REG(dreg_type, dreg));
-
                     GCBifImpl2 func = (GCBifImpl2) mod->imported_funcs[bif].bif;
                     term ret = func(ctx, live, arg1, arg2);
                     if (UNLIKELY(term_is_invalid_term(ret))) {
@@ -4261,8 +3829,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("gc_bif2/6\n");
-
                     UNUSED(f_label)
                     UNUSED(live)
                     UNUSED(bif)
@@ -4286,8 +3852,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_bitstr/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (0) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -4296,7 +3860,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_bitstr/2\n");
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
                 #endif
@@ -4323,8 +3886,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("gc_bif3/7 fail_lbl=%i, live=%i, bif=%i, arg1=0x%lx, arg2=0x%lx, arg3=0x%lx, dest=%c%i\n", f_label, live, bif, arg1, arg2, arg3, T_DEST_REG(dreg_type, dreg));
-
                     GCBifImpl3 func = (GCBifImpl3) mod->imported_funcs[bif].bif;
                     term ret = func(ctx, live, arg1, arg2, arg3);
                     if (UNLIKELY(term_is_invalid_term(ret))) {
@@ -4335,8 +3896,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("gc_bif2/6\n");
-
                     UNUSED(f_label)
                     UNUSED(live)
                     UNUSED(bif)
@@ -4359,10 +3918,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int n_remaining;
                 DECODE_INTEGER(n_remaining, code, i, next_offset, next_offset);
 
-                TRACE("trim/2 words=%i, remaining=%i\n", n_words, n_remaining);
-                USED_BY_TRACE(n_words);
-                USED_BY_TRACE(n_remaining);
-
                 #ifdef IMPL_EXECUTE_LOOP
                     DEBUG_DUMP_STACK(ctx);
                     ctx->e += n_words;
@@ -4382,9 +3937,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_offset, next_offset);
 
-                TRACE("recv_mark/1 label=%i\n", label);
-                USED_BY_TRACE(label);
-
                 NEXT_INSTRUCTION(next_offset);
                 break;
             }
@@ -4396,9 +3948,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int label;
                 DECODE_LABEL(label, code, i, next_offset, next_offset);
 
-                TRACE("recv_set/1 label=%i\n", label);
-                USED_BY_TRACE(label);
-
                 NEXT_INSTRUCTION(next_offset);
                 break;
             }
@@ -4407,8 +3956,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 int line_number;
                 DECODE_INTEGER(line_number, code, i, next_offset, next_offset);
-
-                TRACE("line/1: %i\n", line_number);
 
                 NEXT_INSTRUCTION(next_offset);
                 break;
@@ -4426,8 +3973,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
-
-                TRACE("put_map_assoc/5: label: %i src: 0x%lx dest=%c%i live: %i\n", label, src, T_DEST_REG(dreg_type, dreg), live);
 
                 next_off++; //skip extended list tag {z, 1}
                 int list_len;
@@ -4537,8 +4082,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
 
-                TRACE("put_map_exact/5: label: %i src: 0x%lx dest=%c%i live: %i\n", label, src, T_DEST_REG(dreg_type, dreg), live);
-
                 next_off++; //skip extended list tag {z, 1}
                 int list_len;
                 DECODE_INTEGER(list_len, code, i, next_off, next_off);
@@ -4600,8 +4143,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_map/2, label=%i, arg1=%lx\n", label, arg1);
-
                     if (term_is_map(arg1)) {
                         NEXT_INSTRUCTION(next_off);
                     } else {
@@ -4610,7 +4151,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_map/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -4625,8 +4165,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-
-                TRACE("has_map_fields/3: label: %i src: 0x%lx\n", label, src);
 
                 next_off++; //skip extended list tag {z, 1}
                 int list_len;
@@ -4656,7 +4194,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                TRACE("get_map_elements/3: label: %i src: 0x%lx\n", label, src);
 
                 next_off++; //skip extended list tag {z, 1}
                 int list_len;
@@ -4699,8 +4236,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_ATOM(tag_atom_id, code, i, next_off, next_off)
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("is_tagged_tuple/2, label=%i, arg1=%lx, arity=%i, atom_id=%i\n", label, arg1, arity, tag_atom_id);
-
                     term tag_atom = module_get_atom_term_by_id(mod, tag_atom_id);
 
                     if (term_is_tuple(arg1) && (term_get_tuple_arity(arg1) == arity) && (term_get_tuple_element(arg1, 0) == tag_atom)) {
@@ -4711,7 +4246,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("is_tagged_tuple/2\n");
                     UNUSED(label)
                     UNUSED(arg1)
                     NEXT_INSTRUCTION(next_off);
@@ -4730,15 +4264,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("get_hd/2 %lx, %c%i\n", src_value, T_DEST_REG(head_dreg_type, head_dreg));
-
                     term head = term_get_list_head(src_value);
 
                     WRITE_REGISTER(head_dreg_type, head_dreg, head);
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("get_hd/2\n");
                     UNUSED(src_value)
                 #endif
 
@@ -4755,15 +4286,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("get_tl/2 %lx, %c%i\n", src_value, T_DEST_REG(tail_dreg_type, tail_dreg));
-
                     term tail = term_get_list_tail(src_value);
 
                     WRITE_REGISTER(tail_dreg_type, tail_dreg, tail);
                 #endif
 
                 #ifdef IMPL_CODE_LOADER
-                    TRACE("get_tl/2\n");
                     UNUSED(src_value)
                 #endif
 
@@ -4781,9 +4309,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
-
-                TRACE("put_tuple2/2, size=%i\n", size);
-                USED_BY_TRACE(size);
 
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(dreg);
@@ -4825,8 +4350,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t reg_b_type;
                 DECODE_DEST_REGISTER(reg_b, reg_b_type, code, i, next_off, next_off);
 
-                TRACE("swap/2 a=%c%i, b=%c%i\n", T_DEST_REG(reg_a_type, reg_a), T_DEST_REG(reg_b_type, reg_b));
-
                 #ifdef IMPL_EXECUTE_LOOP
                     term a = READ_DEST_REGISTER(reg_a_type, reg_a);
                     term b = READ_DEST_REGISTER(reg_b_type, reg_b);
@@ -4859,13 +4382,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                #ifdef IMPL_CODE_LOADER
-                    TRACE("bs_start_match4/4\n");
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
-                    TRACE("bs_start_match4/4, fail=%i live=0x%lx src=0x%lx dreg=%c%i\n", fail, live, src, T_DEST_REG(dreg_type, dreg));
-
                     if (!(term_is_binary(src) || term_is_match_state(src))) {
                         WRITE_REGISTER(dreg_type, dreg, src);
                         i = POINTER_TO_II(mod->labels[fail]);
@@ -4937,7 +4454,6 @@ handle_error:
         }
 
 terminate_context:
-        TRACE("-- Code execution finished for %i--\n", ctx->process_id);
         if (ctx->leader) {
             return 0;
         }
