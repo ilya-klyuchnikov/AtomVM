@@ -84,13 +84,6 @@ Context *context_new(GlobalContext *glb)
     list_init(&ctx->monitors_head);
 
     ctx->trap_exit = false;
-    #ifdef ENABLE_ADVANCED_TRACE
-        ctx->trace_calls = 0;
-        ctx->trace_call_args = 0;
-        ctx->trace_returns = 0;
-        ctx->trace_send = 0;
-        ctx->trace_receive = 0;
-    #endif
 
     list_init(&ctx->heap_fragments);
     ctx->heap_fragments_size = 0;

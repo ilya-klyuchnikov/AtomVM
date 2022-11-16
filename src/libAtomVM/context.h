@@ -95,14 +95,6 @@ struct Context
     unsigned int has_max_heap_size : 1;
 
     bool trap_exit : 1;
-    #ifdef ENABLE_ADVANCED_TRACE
-        unsigned int trace_calls : 1;
-        unsigned int trace_call_args : 1;
-        unsigned int trace_returns : 1;
-        unsigned int trace_send : 1;
-        unsigned int trace_receive : 1;
-    #endif
-
 
     struct ListHead heap_fragments;
     int heap_fragments_size;

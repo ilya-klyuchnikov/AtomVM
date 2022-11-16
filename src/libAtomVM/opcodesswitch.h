@@ -854,98 +854,12 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
     return false;
 }
 
-#ifdef ENABLE_ADVANCED_TRACE
-    static void print_function_args(const Context *ctx, int arity)
-    {
-        for (int i = 0; i < arity; i++) {
-            printf("DBG: <0.%i.0> -- arg%i: ", ctx->process_id, i);
-            term_display(stdout, ctx->x[i], ctx);
-            printf("\n");
-        }
-    }
-
-    static void trace_apply(const Context *ctx, const char *call_type, AtomString module_name, AtomString function_name, int arity)
-    {
-        if (UNLIKELY(ctx->trace_calls)) {
-            char module_string[255];
-            atom_string_to_c(module_name, module_string, 255);
-            char func_string[255];
-            atom_string_to_c(function_name, func_string, 255);
-
-            if (ctx->trace_call_args && (arity != 0)) {
-                printf("DBG: <0.%i.0> - %s %s:%s/%i:\n", ctx->process_id, call_type, module_string, func_string, arity);
-                print_function_args(ctx, arity);
-            } else {
-                printf("DBG: <0.%i.0> - %s %s:%s/%i.\n", ctx->process_id, call_type, module_string, func_string, arity);
-            }
-        }
-    }
-
-    static void trace_call(const Context *ctx, const Module *mod, const char *call_type, int label, int arity)
-    {
-        if (UNLIKELY(ctx->trace_calls)) {
-            if (ctx->trace_call_args && (arity != 0)) {
-                printf("DBG: <0.%i.0> - %s %i:%i/%i:\n", ctx->process_id, call_type, mod->module_index, label, arity);
-                print_function_args(ctx, arity);
-            } else {
-                printf("DBG: <0.%i.0> - %s %i:%i/%i.\n", ctx->process_id, call_type, mod->module_index, label, arity);
-            }
-        }
-    }
-
-    static void trace_call_ext(const Context *ctx, const Module *mod, const char *call_type, int index, int arity)
-    {
-        if (UNLIKELY(ctx->trace_calls)) {
-            AtomString module_name;
-            AtomString function_name;
-            module_get_imported_function_module_and_name(mod, index, &module_name, &function_name);
-            trace_apply(ctx, call_type, module_name, function_name, arity);
-        }
-    }
-
-    static void trace_return(const Context *ctx)
-    {
-        if (UNLIKELY(ctx->trace_returns)) {
-            printf("DBG: <0.%i.0> - return, value: ", ctx->process_id);
-            term_display(stdout, ctx->x[0], ctx);
-            printf(".\n");
-        }
-    }
-
-    static void trace_send(const Context *ctx, term pid, term message)
-    {
-        if (UNLIKELY(ctx->trace_send)) {
-            printf("DBG: <0.%i.0> - send, pid: ", ctx->process_id);
-            term_display(stdout, pid, ctx);
-            printf(" message: ");
-            term_display(stdout, message, ctx);
-            printf(".\n");
-        }
-    }
-
-    static void trace_receive(const Context *ctx, term message)
-    {
-        if (UNLIKELY(ctx->trace_send)) {
-            printf("DBG: <0.%i.0> - receive, message: ", ctx->process_id);
-            term_display(stdout, message, ctx);
-            printf(".\n");
-        }
-    }
-
-    #define TRACE_APPLY trace_apply
-    #define TRACE_CALL trace_call
-    #define TRACE_CALL_EXT trace_call_ext
-    #define TRACE_RETURN trace_return
-    #define TRACE_SEND trace_send
-    #define TRACE_RECEIVE trace_receive
-#else
-    #define TRACE_APPLY(...)
-    #define TRACE_CALL(...)
-    #define TRACE_CALL_EXT(...)
-    #define TRACE_RETURN(...)
-    #define TRACE_SEND(...)
-    #define TRACE_RECEIVE(...)
-#endif
+#define TRACE_APPLY(...)
+#define TRACE_CALL(...)
+#define TRACE_CALL_EXT(...)
+#define TRACE_RETURN(...)
+#define TRACE_SEND(...)
+#define TRACE_RECEIVE(...)
 
 #endif
 

@@ -67,14 +67,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define NOT_FOUND (0xFF)
 
-#ifdef ENABLE_ADVANCED_TRACE
-static const char *const trace_calls_atom = "\xB" "trace_calls";
-static const char *const trace_call_args_atom = "\xF" "trace_call_args";
-static const char *const trace_returns_atom = "\xD" "trace_returns";
-static const char *const trace_send_atom = "\xA" "trace_send";
-static const char *const trace_receive_atom = "\xD" "trace_receive";
-#endif
-
 static void process_echo_mailbox(Context *ctx);
 static void process_console_mailbox(Context *ctx);
 
@@ -2132,50 +2124,6 @@ static term nif_erlang_process_flag(Context *ctx, int argc, term argv[])
             return prev;
         }
     }
-
-#ifdef ENABLE_ADVANCED_TRACE
-    if (flag == context_make_atom(target, trace_calls_atom)) {
-        if (value == TRUE_ATOM) {
-            target->trace_calls = 1;
-            return OK_ATOM;
-        } else if (value == FALSE_ATOM) {
-            target->trace_calls = 0;
-            return OK_ATOM;
-        }
-    } else if (flag == context_make_atom(target, trace_call_args_atom)) {
-        if (value == TRUE_ATOM) {
-            target->trace_call_args = 1;
-            return OK_ATOM;
-        } else if (value == FALSE_ATOM) {
-            target->trace_call_args = 0;
-            return OK_ATOM;
-        }
-    } else if (flag == context_make_atom(target, trace_returns_atom)) {
-        if (value == TRUE_ATOM) {
-            target->trace_returns = 1;
-            return OK_ATOM;
-        } else if (value == FALSE_ATOM) {
-            target->trace_returns = 0;
-            return OK_ATOM;
-        }
-    } else if (flag == context_make_atom(target, trace_send_atom)) {
-        if (value == TRUE_ATOM) {
-            target->trace_send = 1;
-            return OK_ATOM;
-        } else if (value == FALSE_ATOM) {
-            target->trace_send = 0;
-            return OK_ATOM;
-        }
-    } else if (flag == context_make_atom(target, trace_receive_atom)) {
-        if (value == TRUE_ATOM) {
-            target->trace_receive = 1;
-            return OK_ATOM;
-        } else if (value == FALSE_ATOM) {
-            target->trace_receive = 0;
-            return OK_ATOM;
-        }
-    }
-#endif
 
     RAISE_ERROR(BADARG_ATOM);
 }
