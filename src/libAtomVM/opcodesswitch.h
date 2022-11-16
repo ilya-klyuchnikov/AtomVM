@@ -205,59 +205,6 @@ typedef union
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
 #ifdef IMPL_EXECUTE_LOOP
-struct Int24
-{
-    int32_t val24 : 24;
-};
-
-struct Int40
-{
-    int64_t val40 : 40;
-};
-
-struct Int48
-{
-    int64_t val48 : 48;
-};
-
-struct Int56
-{
-    int64_t val56 : 56;
-};
-
-#define SWAP_KV_PAIR(I, J)            \
-    {                                 \
-        struct kv_pair tmp = kv[(I)]; \
-        kv[(I)] = kv[(J)];            \
-        kv[(J)] = tmp;                \
-    }
-
-struct kv_pair
-{
-    term key;
-    term value;
-};
-
-static void sort_kv_pairs(Context *ctx, struct kv_pair *kv, int size)
-{
-    int k = size;
-    while (1 < k) {
-        int max_pos = 0;
-        for (int i = 1; i < k; i++) {
-            term t_max = kv[max_pos].key;
-            term t = kv[i].key;
-            int c = term_compare(t, t_max, ctx);
-            if (0 < c) {
-                max_pos = i;
-            }
-        }
-        if (max_pos != k - 1) {
-            SWAP_KV_PAIR(k - 1, max_pos);
-        }
-        k--;
-        // kv[k..size] sorted
-    }
-}
 
 static int get_catch_label_and_change_module(Context *ctx, Module **mod)
 {
