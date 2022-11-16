@@ -19,7 +19,6 @@
  */
 
 #include "scheduler.h"
-#include "debug.h"
 #include "list.h"
 #include "sys.h"
 #include "utils.h"

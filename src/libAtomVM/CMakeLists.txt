@@ -29,7 +29,6 @@ set(HEADER_FILES
     bitstring.h
     context.h
     ccontext.h
-    debug.h
     defaultatoms.h
     dictionary.h
     exportedfunction.h
@@ -66,7 +65,6 @@ set(SOURCE_FILES
     bif.c
     bitstring.c
     context.c
-    debug.c
     defaultatoms.c
     dictionary.c
     externalterm.c

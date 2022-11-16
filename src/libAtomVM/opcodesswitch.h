@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "bif.h"
-#include "debug.h"
 #include "defaultatoms.h"
 #include "exportedfunction.h"
 #include "nifs.h"
@@ -551,9 +550,7 @@ static int get_catch_label_and_change_module(Context *ctx, Module **mod)
             int target_label = term_to_catch_label_and_module(*ct, &target_module);
             *mod = ctx->global->modules_by_index[target_module];
 
-            DEBUG_DUMP_STACK(ctx);
             ctx->e = last_frame;
-            DEBUG_DUMP_STACK(ctx);
 
             return target_label;
 
@@ -972,8 +969,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #ifdef IMPL_EXECUTE_LOOP
                     ctx->cp = ctx->e[n_words];
                     ctx->e += (n_words + 1);
-
-                    DEBUG_DUMP_STACK(ctx);
 
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
@@ -1396,11 +1391,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(n_words, code, i, next_off, next_off);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    DEBUG_DUMP_STACK(ctx);
-
                     ctx->cp = ctx->e[n_words];
                     ctx->e += n_words + 1;
-                    DEBUG_DUMP_STACK(ctx);
                 #endif
 
                 NEXT_INSTRUCTION(next_off);
@@ -3919,9 +3911,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(n_remaining, code, i, next_offset, next_offset);
 
                 #ifdef IMPL_EXECUTE_LOOP
-                    DEBUG_DUMP_STACK(ctx);
                     ctx->e += n_words;
-                    DEBUG_DUMP_STACK(ctx);
                 #endif
 
                 UNUSED(n_remaining)
