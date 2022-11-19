@@ -31,10 +31,6 @@
 #include "scheduler.h"
 #include "utils.h"
 
-#define ENABLE_OTP21
-#define ENABLE_OTP22
-#define ENABLE_OTP23
-
 #define COMPACT_LITERAL 0
 #define COMPACT_SMALLINT4 1
 #define COMPACT_ATOM 2
@@ -3911,7 +3907,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 break;
             }
 
-#ifdef ENABLE_OTP21
             case OP_GET_HD: {
                 int next_off = 1;
                 term src_value;
@@ -3955,9 +3950,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
-#endif
 
-#ifdef ENABLE_OTP22
             case OP_PUT_TUPLE2: {
                 int next_off = 1;
                 dreg_t dreg;
@@ -3995,9 +3988,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
-#endif
 
-#ifdef ENABLE_OTP23
             case OP_SWAP: {
                 int next_off = 1;
                 dreg_t reg_a;
@@ -4056,7 +4047,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 #endif
                 break;
             }
-#endif
 
             default:
                 printf("Undecoded opcode: %i\n", code[i]);
