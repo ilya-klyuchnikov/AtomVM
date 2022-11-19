@@ -420,15 +420,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #endif
 #endif
 
-#ifdef IMPL_CODE_LOADER
-    int read_core_chunk(Module *mod)
-#else
-    #ifdef IMPL_EXECUTE_LOOP
         HOT_FUNC int context_execute_loop(Context *ctx, Module *mod, const char *function_name, int arity)
-    #else
-        #error Need implementation type
-    #endif
-#endif
 {
     uint8_t *code = mod->code->code;
     #ifdef IMPL_EXECUTE_LOOP
@@ -465,10 +457,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 DECODE_LABEL(label, code, i, next_offset, next_offset)
 
-                #ifdef IMPL_CODE_LOADER
-                    module_add_label(mod, label, &code[i]);
-                #endif
-
                 NEXT_INSTRUCTION(next_offset);
                 break;
             }
@@ -491,10 +479,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_INT_CALL_END: {
-            #ifdef IMPL_CODE_LOADER
-                return i;
-            #endif
-
             #ifdef IMPL_EXECUTE_LOOP
                 ctx->exit_reason = NORMAL_ATOM;
                 goto terminate_context;
@@ -518,10 +502,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         SCHEDULE_NEXT(mod, mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_offset);
                 #endif
 
                 break;
@@ -548,10 +528,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_offset);
-                #endif
-
                 break;
             }
 
@@ -573,10 +549,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -586,10 +558,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(arity, code, i, next_off, next_off);
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     remaining_reductions--;
@@ -698,10 +666,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -737,10 +701,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl1 func = (BifImpl1) mod->imported_funcs[bif].bif;
                     term ret = func(ctx, arg1);
@@ -769,11 +729,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1);
-                    UNUSED(arg2);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl2 func = (BifImpl2) mod->imported_funcs[bif].bif;
@@ -978,9 +933,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     DO_RETURN();
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(1);
-                #endif
                 break;
             }
 
@@ -1054,10 +1006,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1095,10 +1043,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     mod = ctx->saved_module;
                     code = mod->code->code;
                     JUMP_TO_ADDRESS(scheduled_context->saved_ip);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1145,12 +1089,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(timeout)
-
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1171,12 +1109,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1195,12 +1127,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1224,12 +1150,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1248,12 +1168,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1277,12 +1191,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1304,12 +1212,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1326,12 +1228,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1357,12 +1253,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #endif
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1380,12 +1270,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1406,11 +1290,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1427,11 +1306,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1452,11 +1326,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1473,11 +1342,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1498,11 +1362,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1521,11 +1380,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1542,11 +1396,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1574,11 +1423,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1595,12 +1439,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -1623,12 +1461,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1642,10 +1474,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     void *jump_to_address = NULL;
                 #endif
@@ -1655,10 +1483,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     DECODE_COMPACT_TERM(cmp_value, code, i, next_off, next_off)
                     int jmp_label;
                     DECODE_LABEL(jmp_label, code, i, next_off, next_off)
-
-                    #ifdef IMPL_CODE_LOADER
-                        UNUSED(cmp_value);
-                    #endif
 
                     #ifdef IMPL_EXECUTE_LOOP
                         if (!jump_to_address && (src_value == cmp_value)) {
@@ -1675,10 +1499,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1691,10 +1511,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     void *jump_to_address = NULL;
@@ -1710,10 +1526,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                         DECODE_INTEGER(cmp_value, code, i, next_off, next_off)
                         int jmp_label;
                         DECODE_LABEL(jmp_label, code, i, next_off, next_off)
-
-                        #ifdef IMPL_CODE_LOADER
-                            UNUSED(cmp_value);
-                        #endif
 
                         #ifdef IMPL_EXECUTE_LOOP
                             //TODO: check if src_value is a tuple
@@ -1734,10 +1546,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1755,10 +1563,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_offset);
-                #endif
-
                 break;
             }
 
@@ -1772,10 +1576,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                 #ifdef IMPL_EXECUTE_LOOP
                     WRITE_REGISTER(dreg_type, dreg, src_value);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value)
                 #endif
 
                 NEXT_INSTRUCTION(next_off);
@@ -1801,10 +1601,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     WRITE_REGISTER(tail_dreg_type, tail_dreg, tail);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value)
-                #endif
-
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -1828,10 +1624,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     WRITE_REGISTER(dreg_type, dreg, t);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value)
-                #endif
-
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -1853,11 +1645,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term_put_tuple_element(tuple, position, new_element);
 #endif
 
-#ifdef IMPL_CODE_LOADER
-                UNUSED(tuple);
-                UNUSED(position);
-                UNUSED(new_element);
-#endif
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -1876,11 +1663,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #ifdef IMPL_EXECUTE_LOOP
                 term *list_elem = term_list_alloc(ctx);
 #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(head);
-                    UNUSED(tail);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term t = term_list_init_prepend(list_elem, head, tail);
@@ -1912,10 +1694,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     next_off++;
                     term put_value;
                     DECODE_COMPACT_TERM(put_value, code, i, next_off, next_off);
-                    #ifdef IMPL_CODE_LOADER
-                        UNUSED(put_value);
-                    #endif
-
                     #ifdef IMPL_EXECUTE_LOOP
                         term_put_tuple_element(t, j, put_value);
                     #endif
@@ -1945,10 +1723,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     RAISE_ERROR(new_error_tuple);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -1958,10 +1732,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     ctx->x[1] = IF_CLAUSE_ATOM;
 
                     RAISE_ERROR(IF_CLAUSE_ATOM);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(1);
                 #endif
 
                 break;
@@ -1985,10 +1755,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     term_put_tuple_element(new_error_tuple, 1, arg1);
 
                     RAISE_ERROR(new_error_tuple);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -2078,10 +1844,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     JUMP_TO_ADDRESS(mod->labels[label]);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -2100,12 +1862,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -2115,10 +1871,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(arity, code, i, next_off, next_off);
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
-
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     remaining_reductions--;
@@ -2249,10 +2001,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     term new_error_tuple = term_alloc_tuple(2, ctx);
                     //TODO: ensure memory before
@@ -2273,10 +2021,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 UNUSED(stacktrace);
                 term exc_value;
                 DECODE_COMPACT_TERM(exc_value, code, i, next_off, next_off);
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(exc_value);
-                #endif
 
                 #ifdef IMPL_EXECUTE_LOOP
                     RAISE_ERROR(exc_value);
@@ -2668,9 +2412,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
                 break;
             }
 
@@ -2704,9 +2445,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
                 break;
             }
 
@@ -2837,10 +2575,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                         NEXT_INSTRUCTION(next_off);
                     }
                 #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -2929,9 +2663,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
 
                 #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
                 break;
             }
 
@@ -2953,9 +2684,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         NEXT_INSTRUCTION(next_off);
                     }
-                #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
                 break;
             }
@@ -2980,9 +2708,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         NEXT_INSTRUCTION(next_off);
                     }
-                #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
                 break;
             }
@@ -3031,9 +2756,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                         WRITE_REGISTER(dreg_type, dreg, t);
                         NEXT_INSTRUCTION(next_off);
                     }
-                #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
                 break;
             }
@@ -3102,9 +2824,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     NEXT_INSTRUCTION(next_off);
                 }
 
-                #endif
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
                 #endif
                 break;
             }
@@ -3191,9 +2910,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     JUMP_TO_ADDRESS(mod->labels[target_label]);
                 }
 #endif
-#ifdef IMPL_CODE_LOADER
-                NEXT_INSTRUCTION(next_off);
-#endif
                 break;
             }
 
@@ -3245,9 +2961,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     JUMP_TO_ADDRESS(mod->labels[target_label]);
                 }
 #endif
-#ifdef IMPL_CODE_LOADER
-                NEXT_INSTRUCTION(next_off);
-#endif
                 break;
             }
 
@@ -3264,12 +2977,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -3317,12 +3024,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -3348,14 +3049,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
 
                     WRITE_REGISTER(dreg_type, dreg, ret);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(dreg)
                 #endif
 
                 UNUSED(f_label)
@@ -3390,15 +3083,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     WRITE_REGISTER(dreg_type, dreg, ret);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    UNUSED(dreg)
-                #endif
-
                 UNUSED(f_label)
 
                 NEXT_INSTRUCTION(next_off);
@@ -3419,11 +3103,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     } else {
                         i = POINTER_TO_II(mod->labels[label]);
                     }
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
                 #endif
 
                 break;
@@ -3455,16 +3134,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
 
                     WRITE_REGISTER(dreg_type, dreg, ret);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    UNUSED(arg3)
-                    UNUSED(dreg)
                 #endif
 
                 UNUSED(f_label)
@@ -3710,12 +3379,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -3805,12 +3468,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
-                #endif
-
                 break;
             }
 
@@ -3826,10 +3483,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     term head = term_get_list_head(src_value);
 
                     WRITE_REGISTER(head_dreg_type, head_dreg, head);
-                #endif
-
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value)
                 #endif
 
                 NEXT_INSTRUCTION(next_off);
@@ -3850,10 +3503,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     WRITE_REGISTER(tail_dreg_type, tail_dreg, tail);
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(src_value)
-                #endif
-
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -3867,10 +3516,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
 
-                #ifdef IMPL_CODE_LOADER
-                    UNUSED(dreg);
-                #endif
-
                 #ifdef IMPL_EXECUTE_LOOP
                     term t = term_alloc_tuple(size, ctx);
                 #endif
@@ -3878,10 +3523,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 for (int j = 0; j < size; j++) {
                     term element;
                     DECODE_COMPACT_TERM(element, code, i, next_off, next_off)
-
-                    #ifdef IMPL_CODE_LOADER
-                        UNUSED(element);
-                    #endif
 
                     #ifdef IMPL_EXECUTE_LOOP
                         term_put_tuple_element(t, j, element);
@@ -3949,9 +3590,6 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
                 #endif
 
-                #ifdef IMPL_CODE_LOADER
-                    NEXT_INSTRUCTION(next_off);
-                #endif
                 break;
             }
 
