@@ -19,6 +19,7 @@ src/libAtomVM/module.c
 src/libAtomVM/module.h
 src/libAtomVM/nifs.c
 src/libAtomVM/opcodesswitch.h
+src/libAtomVM/opcodesswitch_module.h
 src/libAtomVM/overflow_helpers.h
 src/libAtomVM/scheduler.c
 src/libAtomVM/term.c

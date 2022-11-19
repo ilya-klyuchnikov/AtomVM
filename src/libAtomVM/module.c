@@ -151,7 +151,7 @@ static void module_add_label(Module *mod, int index, void *ptr);
 }
 
 #define IMPL_CODE_LOADER 1
-#include "opcodesswitch.h"
+#include "opcodesswitch_module.h"
 #undef TRACE
 #undef IMPL_CODE_LOADER
 
