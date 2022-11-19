@@ -39,7 +39,7 @@
 #endif
 #endif
 
-    int read_core_chunk(Module *mod)
+int read_core_chunk(Module *mod)
 {
     uint8_t *code = mod->code->code;
 
@@ -53,7 +53,7 @@
                 int next_offset = 1;
                 DECODE_LABEL(label, code, i, next_offset, next_offset)
 
-                    module_add_label(mod, label, &code[i]);
+                module_add_label(mod, label, &code[i]);
 
                 NEXT_INSTRUCTION(next_offset);
                 break;
@@ -83,7 +83,7 @@
                 int label;
                 DECODE_LABEL(label, code, i, next_offset, next_offset);
 
-                    NEXT_INSTRUCTION(next_offset);
+                NEXT_INSTRUCTION(next_offset);
 
                 break;
             }
@@ -97,7 +97,7 @@
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_offset, next_offset);
 
-                    NEXT_INSTRUCTION(next_offset);
+                NEXT_INSTRUCTION(next_offset);
 
                 break;
             }
@@ -109,7 +109,7 @@
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -121,7 +121,7 @@
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -135,7 +135,7 @@
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -152,7 +152,7 @@
                 break;
             }
 
-            //TODO: implement me
+            // TODO: implement me
             case OP_BIF1: {
                 int next_off = 1;
                 int fail_label;
@@ -165,13 +165,13 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(arg1);
+                UNUSED(arg1);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
 
-            //TODO: implement me
+            // TODO: implement me
             case OP_BIF2: {
                 int next_off = 1;
                 int fail_label;
@@ -186,8 +186,8 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(arg1);
-                    UNUSED(arg2);
+                UNUSED(arg1);
+                UNUSED(arg2);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -272,11 +272,11 @@
             }
 
             case OP_RETURN: {
-                    NEXT_INSTRUCTION(1);
+                NEXT_INSTRUCTION(1);
                 break;
             }
 
-            //TODO: implement send/0
+            // TODO: implement send/0
             case OP_SEND: {
                 NEXT_INSTRUCTION(1);
                 break;
@@ -300,7 +300,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -314,18 +314,18 @@
                 break;
             }
 
-            //TODO: implement wait/1
+            // TODO: implement wait/1
             case OP_WAIT: {
                 int next_off = 1;
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
-            //TODO: implement wait_timeout/2
+            // TODO: implement wait_timeout/2
             case OP_WAIT_TIMEOUT: {
                 int next_off = 1;
                 int label;
@@ -333,9 +333,9 @@
                 term timeout;
                 DECODE_COMPACT_TERM(timeout, code, i, next_off, next_off)
 
-                    UNUSED(timeout)
+                UNUSED(timeout)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -349,9 +349,9 @@
                 term arg2;
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -365,9 +365,9 @@
                 term arg2;
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -381,9 +381,9 @@
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -397,9 +397,9 @@
                 term arg2;
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -413,9 +413,9 @@
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -428,9 +428,9 @@
                 term arg2;
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                UNUSED(arg2)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -442,9 +442,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -456,9 +456,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -470,9 +470,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -484,8 +484,8 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -497,8 +497,8 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -510,8 +510,8 @@
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -523,8 +523,8 @@
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -536,8 +536,8 @@
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -549,8 +549,8 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -562,8 +562,8 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -575,8 +575,8 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -588,9 +588,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -604,9 +604,9 @@
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_off, next_off);
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -617,11 +617,11 @@
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 int default_label;
                 DECODE_LABEL(default_label, code, i, next_off, next_off)
-                next_off++; //skip extended list tag
+                next_off++; // skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
 
-                    UNUSED(src_value);
+                UNUSED(src_value);
 
                 for (int j = 0; j < size / 2; j++) {
                     term cmp_value;
@@ -629,10 +629,10 @@
                     int jmp_label;
                     DECODE_LABEL(jmp_label, code, i, next_off, next_off)
 
-                        UNUSED(cmp_value);
+                    UNUSED(cmp_value);
                 }
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -643,22 +643,22 @@
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 int default_label;
                 DECODE_LABEL(default_label, code, i, next_off, next_off)
-                next_off++; //skip extended list tag
+                next_off++; // skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
 
-                    UNUSED(src_value);
+                UNUSED(src_value);
 
-                    for (int j = 0; j < size / 2; j++) {
-                        int cmp_value;
-                        DECODE_INTEGER(cmp_value, code, i, next_off, next_off)
-                        int jmp_label;
-                        DECODE_LABEL(jmp_label, code, i, next_off, next_off)
+                for (int j = 0; j < size / 2; j++) {
+                    int cmp_value;
+                    DECODE_INTEGER(cmp_value, code, i, next_off, next_off)
+                    int jmp_label;
+                    DECODE_LABEL(jmp_label, code, i, next_off, next_off)
 
-                            UNUSED(cmp_value);
-                    }
+                    UNUSED(cmp_value);
+                }
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -668,7 +668,7 @@
                 int next_offset = 1;
                 DECODE_LABEL(label, code, i, next_offset, next_offset)
 
-                    NEXT_INSTRUCTION(next_offset);
+                NEXT_INSTRUCTION(next_offset);
 
                 break;
             }
@@ -681,7 +681,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(src_value)
+                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -698,7 +698,7 @@
                 dreg_type_t tail_dreg_type;
                 DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(src_value)
+                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -714,7 +714,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(src_value)
+                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -747,9 +747,8 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-
-                    UNUSED(head);
-                    UNUSED(tail);
+                UNUSED(head);
+                UNUSED(tail);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -771,7 +770,7 @@
                     next_off++;
                     term put_value;
                     DECODE_COMPACT_TERM(put_value, code, i, next_off, next_off);
-                        UNUSED(put_value);
+                    UNUSED(put_value);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -783,13 +782,13 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IF_END: {
-                    NEXT_INSTRUCTION(1);
+                NEXT_INSTRUCTION(1);
 
                 break;
             }
@@ -799,7 +798,7 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -809,21 +808,21 @@
                 unsigned int args_count;
                 DECODE_INTEGER(args_count, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
-           case OP_IS_FUNCTION: {
+            case OP_IS_FUNCTION: {
                 int next_off = 1;
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -835,7 +834,7 @@
                 int index;
                 DECODE_INTEGER(index, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -886,7 +885,7 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1);
+                UNUSED(arg1);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -900,7 +899,7 @@
                 term exc_value;
                 DECODE_COMPACT_TERM(exc_value, code, i, next_off, next_off);
 
-                    UNUSED(exc_value);
+                UNUSED(exc_value);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1076,7 +1075,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1092,7 +1091,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1147,7 +1146,7 @@
                 avm_int_t offset;
                 DECODE_INTEGER(offset, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1187,7 +1186,7 @@
                 term flags;
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1200,7 +1199,7 @@
                 avm_int_t unit;
                 DECODE_INTEGER(unit, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1213,7 +1212,7 @@
                 avm_int_t bits;
                 DECODE_INTEGER(bits, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1235,7 +1234,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1258,7 +1257,7 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1297,9 +1296,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1313,9 +1312,9 @@
                 unsigned int arity;
                 DECODE_INTEGER(arity, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1327,18 +1326,18 @@
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
-                DECODE_INTEGER(bif, code, i, next_off, next_off); //s?
+                DECODE_INTEGER(bif, code, i, next_off, next_off); // s?
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(dreg)
+                UNUSED(f_label)
+                UNUSED(live)
+                UNUSED(bif)
+                UNUSED(arg1)
+                UNUSED(dreg)
 
                 UNUSED(f_label)
 
@@ -1353,7 +1352,7 @@
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
-                DECODE_INTEGER(bif, code, i, next_off, next_off); //s?
+                DECODE_INTEGER(bif, code, i, next_off, next_off); // s?
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
                 term arg2;
@@ -1362,12 +1361,12 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    UNUSED(dreg)
+                UNUSED(f_label)
+                UNUSED(live)
+                UNUSED(bif)
+                UNUSED(arg1)
+                UNUSED(arg2)
+                UNUSED(dreg)
 
                 UNUSED(f_label)
 
@@ -1375,7 +1374,7 @@
                 break;
             }
 
-            //TODO: stub, always false
+            // TODO: stub, always false
             case OP_IS_BITSTR: {
                 int label;
                 term arg1;
@@ -1383,8 +1382,8 @@
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1396,7 +1395,7 @@
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
-                DECODE_INTEGER(bif, code, i, next_off, next_off); //s?
+                DECODE_INTEGER(bif, code, i, next_off, next_off); // s?
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
                 term arg2;
@@ -1407,13 +1406,13 @@
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(f_label)
-                    UNUSED(live)
-                    UNUSED(bif)
-                    UNUSED(arg1)
-                    UNUSED(arg2)
-                    UNUSED(arg3)
-                    UNUSED(dreg)
+                UNUSED(f_label)
+                UNUSED(live)
+                UNUSED(bif)
+                UNUSED(arg1)
+                UNUSED(arg2)
+                UNUSED(arg3)
+                UNUSED(dreg)
 
                 UNUSED(f_label)
 
@@ -1434,8 +1433,8 @@
                 break;
             }
 
-            //TODO: stub, implement recv_mark/1
-            //it looks like it can be safely left unimplemented
+            // TODO: stub, implement recv_mark/1
+            // it looks like it can be safely left unimplemented
             case OP_RECV_MARK: {
                 int next_offset = 1;
                 int label;
@@ -1445,8 +1444,8 @@
                 break;
             }
 
-            //TODO: stub, implement recv_set/1
-            //it looks like it can be safely left unimplemented
+            // TODO: stub, implement recv_set/1
+            // it looks like it can be safely left unimplemented
             case OP_RECV_SET: {
                 int next_offset = 1;
                 int label;
@@ -1478,7 +1477,7 @@
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
 
-                next_off++; //skip extended list tag {z, 1}
+                next_off++; // skip extended list tag {z, 1}
                 int list_len;
                 DECODE_INTEGER(list_len, code, i, next_off, next_off);
                 int list_off = next_off;
@@ -1487,7 +1486,7 @@
                 // Count how many of the entries in list(...) are not already in src
                 //
                 unsigned new_entries = 0;
-                for (int j = 0;  j < num_elements;  ++j) {
+                for (int j = 0; j < num_elements; ++j) {
                     term key, value;
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                     DECODE_COMPACT_TERM(value, code, i, next_off, next_off);
@@ -1510,7 +1509,7 @@
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
 
-                next_off++; //skip extended list tag {z, 1}
+                next_off++; // skip extended list tag {z, 1}
                 int list_len;
                 DECODE_INTEGER(list_len, code, i, next_off, next_off);
                 int list_off = next_off;
@@ -1518,7 +1517,7 @@
                 //
                 // Make sure every key from list is in src
                 //
-                for (int j = 0;  j < num_elements;  ++j) {
+                for (int j = 0; j < num_elements; ++j) {
                     term key, value;
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                     DECODE_COMPACT_TERM(value, code, i, next_off, next_off);
@@ -1535,9 +1534,9 @@
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1549,11 +1548,11 @@
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
-                next_off++; //skip extended list tag {z, 1}
+                next_off++; // skip extended list tag {z, 1}
                 int list_len;
                 DECODE_INTEGER(list_len, code, i, next_off, next_off);
                 int fail = 0;
-                for (int j = 0;  j < list_len && !fail;  ++j) {
+                for (int j = 0; j < list_len && !fail; ++j) {
                     term key;
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                 }
@@ -1570,12 +1569,12 @@
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
-                next_off++; //skip extended list tag {z, 1}
+                next_off++; // skip extended list tag {z, 1}
                 int list_len;
                 DECODE_INTEGER(list_len, code, i, next_off, next_off);
                 int num_elements = list_len / 2;
                 int fail = 0;
-                for (int j = 0;  j < num_elements && !fail;  ++j) {
+                for (int j = 0; j < num_elements && !fail; ++j) {
                     term key;
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                     dreg_t dreg;
@@ -1599,9 +1598,9 @@
                 int tag_atom_id;
                 DECODE_ATOM(tag_atom_id, code, i, next_off, next_off)
 
-                    UNUSED(label)
-                    UNUSED(arg1)
-                    NEXT_INSTRUCTION(next_off);
+                UNUSED(label)
+                UNUSED(arg1)
+                NEXT_INSTRUCTION(next_off);
 
                 break;
             }
@@ -1614,7 +1613,7 @@
                 dreg_type_t head_dreg_type;
                 DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(src_value)
+                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1628,7 +1627,7 @@
                 dreg_type_t tail_dreg_type;
                 DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
 
-                    UNUSED(src_value)
+                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1639,17 +1638,17 @@
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
-                next_off++; //skip extended list tag
+                next_off++; // skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
 
-                    UNUSED(dreg);
+                UNUSED(dreg);
 
                 for (int j = 0; j < size; j++) {
                     term element;
                     DECODE_COMPACT_TERM(element, code, i, next_off, next_off)
 
-                        UNUSED(element);
+                    UNUSED(element);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -1681,7 +1680,7 @@
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
-                    NEXT_INSTRUCTION(next_off);
+                NEXT_INSTRUCTION(next_off);
                 break;
             }
 
@@ -1690,7 +1689,6 @@
                 AVM_ABORT();
                 return 1;
         }
-
     }
 }
 
