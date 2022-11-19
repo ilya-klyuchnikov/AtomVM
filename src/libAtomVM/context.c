@@ -24,6 +24,7 @@
 #include "globalcontext.h"
 #include "list.h"
 #include "mailbox.h"
+#include "opcodesswitch_common.h"
 #include "bitstring.h"
 
 #define T_DEST_REG(dreg_type, dreg) \
@@ -183,11 +184,11 @@
                 (dreg) = (((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1]);                   \
                 next_operand_offset += 2;                                                                       \
             } else {                                                                                            \
-                VM_ABORT();                                                                                     \
+                abort();                                                                                        \
             }                                                                                                   \
             break;                                                                                              \
         default:                                                                                                \
-            VM_ABORT();                                                                                         \
+            abort();                                                                                            \
     }                                                                                                           \
 }
 
