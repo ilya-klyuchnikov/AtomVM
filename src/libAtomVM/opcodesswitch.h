@@ -711,7 +711,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(bif, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     BifImpl0 func = (BifImpl0) mod->imported_funcs[bif].bif;
@@ -735,7 +735,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(arg1);
@@ -768,7 +768,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_CODE_LOADER
                     UNUSED(arg1);
@@ -1041,7 +1041,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_LABEL(label, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (list_is_empty(&ctx->mailbox)) {
@@ -1768,7 +1768,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     WRITE_REGISTER(dreg_type, dreg, src_value);
@@ -1788,10 +1788,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t head_dreg;
                 dreg_type_t head_dreg_type;
-                DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 dreg_t tail_dreg;
                 dreg_type_t tail_dreg_type;
-                DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term head = term_get_list_head(src_value);
@@ -1817,7 +1817,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(element, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (UNLIKELY(!term_is_tuple(src_value) || (element < 0) || (element >= term_get_tuple_arity(src_value)))) {
@@ -1871,7 +1871,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(tail, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
 #ifdef IMPL_EXECUTE_LOOP
                 term *list_elem = term_list_alloc(ctx);
@@ -1897,7 +1897,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(size, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term t = term_alloc_tuple(size, ctx);
@@ -2194,7 +2194,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
@@ -2212,7 +2212,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     //TODO: here just write to y registers is enough
@@ -2227,7 +2227,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     // clears the catch value on stack
@@ -2290,7 +2290,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 int label;
                 DECODE_LABEL(label, code, i, next_off, next_off)
 
@@ -2308,7 +2308,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     // TODO: here just write to y registers is enough
@@ -2363,7 +2363,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_INTEGER(unit, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(src1, "bs_add");
@@ -2394,7 +2394,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(size, "bs_init2");
@@ -2429,7 +2429,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_INTEGER(size, "bs_init_bits");
@@ -2480,7 +2480,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_BINARY(src, "bs_append");
@@ -2644,7 +2644,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(slots_term, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     int slots = term_to_int(slots_term);
@@ -2690,7 +2690,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (!(term_is_binary(src) || term_is_match_state(src))) {
@@ -2716,7 +2716,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
@@ -2740,7 +2740,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
@@ -3003,7 +3003,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_integer");
@@ -3055,7 +3055,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     VERIFY_IS_MATCH_STATE(src, "bs_get_binary2");
@@ -3113,7 +3113,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 // Do not check if dreg is a binary or not
                 // In case it is not a binary or a match state, dreg will not be changed.
@@ -3338,7 +3338,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     GCBifImpl1 func = (GCBifImpl1) mod->imported_funcs[bif].bif;
@@ -3378,7 +3378,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     GCBifImpl2 func = (GCBifImpl2) mod->imported_funcs[bif].bif;
@@ -3445,7 +3445,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(arg3, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     GCBifImpl3 func = (GCBifImpl3) mod->imported_funcs[bif].bif;
@@ -3530,7 +3530,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
 
@@ -3638,7 +3638,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
 
@@ -3765,7 +3765,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                     dreg_t dreg;
                     dreg_type_t dreg_type;
-                    DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                    DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                     #ifdef IMPL_EXECUTE_LOOP
                         int pos = term_find_map_pos(ctx, src, key);
@@ -3820,7 +3820,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t head_dreg;
                 dreg_type_t head_dreg_type;
-                DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term head = term_get_list_head(src_value);
@@ -3842,7 +3842,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t tail_dreg;
                 dreg_type_t tail_dreg_type;
-                DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term tail = term_get_list_tail(src_value);
@@ -3862,7 +3862,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
@@ -3900,10 +3900,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 dreg_t reg_a;
                 dreg_type_t reg_a_type;
-                DECODE_DEST_REGISTER(reg_a, reg_a_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off, &x_regs, ctx);
                 dreg_t reg_b;
                 dreg_type_t reg_b_type;
-                DECODE_DEST_REGISTER(reg_b, reg_b_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&reg_b, &reg_b_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     term a = READ_DEST_REGISTER(reg_a_type, reg_a);
@@ -3935,7 +3935,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
 
                 #ifdef IMPL_EXECUTE_LOOP
                     if (!(term_is_binary(src) || term_is_match_state(src))) {
