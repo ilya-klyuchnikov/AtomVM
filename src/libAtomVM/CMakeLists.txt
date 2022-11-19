@@ -43,6 +43,7 @@ set(HEADER_FILES
     module.h
     opcodes.h
     opcodesswitch.h
+    opcodesswitch_common.h
     opcodesswitch_module.h
     overflow_helpers.h
     nifs.h
