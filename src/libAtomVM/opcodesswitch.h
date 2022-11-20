@@ -442,9 +442,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
         switch (code[i]) {
             case OP_LABEL: {
-                int label;
                 int next_offset = 1;
-                DECODE_LABEL(label, code, i, next_offset, next_offset)
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                 NEXT_INSTRUCTION(next_offset);
                 break;
@@ -474,8 +473,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_offset, next_offset);
-                int label;
-                DECODE_LABEL(label, code, i, next_offset, next_offset);
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                     NEXT_INSTRUCTION(next_offset);
                     ctx->cp = module_address(mod->module_index, i);
@@ -494,8 +492,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_offset = 1;
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_offset, next_offset);
-                int label;
-                DECODE_LABEL(label, code, i, next_offset, next_offset);
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
                 int n_words;
                 DECODE_INTEGER(n_words, code, i, next_offset, next_offset);
 
@@ -516,8 +513,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_off, next_off);
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
 
 
                     NEXT_INSTRUCTION(next_off);
@@ -664,8 +660,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //TODO: implement me
             case OP_BIF1: {
                 int next_off = 1;
-                int fail_label;
-                DECODE_LABEL(fail_label, code, i, next_off, next_off);
+                int fail_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int bif;
                 DECODE_INTEGER(bif, code, i, next_off, next_off);
                 term arg1;
@@ -689,8 +684,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //TODO: implement me
             case OP_BIF2: {
                 int next_off = 1;
-                int fail_label;
-                DECODE_LABEL(fail_label, code, i, next_off, next_off);
+                int fail_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int bif;
                 DECODE_INTEGER(bif, code, i, next_off, next_off);
                 term arg1;
@@ -936,8 +930,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_LOOP_REC: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
@@ -956,8 +949,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_LOOP_REC_END: {
                 int next_offset = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_offset, next_offset);
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                 struct ListHead *msg = list_first(&ctx->mailbox);
                 list_remove(msg);
@@ -970,8 +962,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //TODO: implement wait/1
             case OP_WAIT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
 
                     ctx->saved_ip = mod->labels[label];
                     ctx->jump_to_on_restore = NULL;
@@ -990,8 +981,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //TODO: implement wait_timeout/2
             case OP_WAIT_TIMEOUT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term timeout;
                 DECODE_COMPACT_TERM(timeout, code, i, next_off, next_off)
 
@@ -1031,8 +1021,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_LT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off);
+                int label = DECODE_LABEL(code, i, next_off, &next_off);;
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
                 term arg2;
@@ -1049,8 +1038,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_GE: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off);
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
                 term arg2;
@@ -1066,11 +1054,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IS_EQUAL: {
-                int label;
                 term arg1;
                 term arg2;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
@@ -1086,8 +1073,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_NOT_EQUAL: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 term arg2;
@@ -1103,11 +1089,10 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IS_EQ_EXACT: {
-                int label;
                 term arg1;
                 term arg2;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
 
@@ -1123,8 +1108,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_NOT_EQ_EXACT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 term arg2;
@@ -1142,8 +1126,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_INTEGER: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1158,8 +1141,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_FLOAT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1179,8 +1161,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_NUMBER: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1196,8 +1177,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_BINARY: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1212,8 +1192,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_LIST: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1227,10 +1206,9 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IS_NONEMPTY_LIST: {
-                int label;
                 term arg1;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                     if (term_is_nonempty_list(arg1)) {
@@ -1243,10 +1221,9 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IS_NIL: {
-                int label;
                 term arg1;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                     if (term_is_nil(arg1)) {
@@ -1259,10 +1236,9 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_IS_ATOM: {
-                int label;
                 term arg1;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                     if (term_is_atom(arg1)) {
@@ -1276,8 +1252,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_PID: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1292,8 +1267,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_REFERENCE: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1308,8 +1282,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_PORT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1331,8 +1304,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_TUPLE: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1347,8 +1319,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_TEST_ARITY: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off);
+                int label = DECODE_LABEL(code, i, next_off, &next_off);;
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
                 int arity;
@@ -1367,8 +1338,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 term src_value;
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
-                int default_label;
-                DECODE_LABEL(default_label, code, i, next_off, next_off)
+                int default_label = DECODE_LABEL(code, i, next_off, &next_off);
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
@@ -1378,8 +1348,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 for (int j = 0; j < size / 2; j++) {
                     term cmp_value;
                     DECODE_COMPACT_TERM(cmp_value, code, i, next_off, next_off)
-                    int jmp_label;
-                    DECODE_LABEL(jmp_label, code, i, next_off, next_off)
+                    int jmp_label = DECODE_LABEL(code, i, next_off, &next_off);
 
                         if (!jump_to_address && (src_value == cmp_value)) {
                             jump_to_address = mod->labels[jmp_label];
@@ -1399,8 +1368,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 int next_off = 1;
                 term src_value;
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
-                int default_label;
-                DECODE_LABEL(default_label, code, i, next_off, next_off)
+                int default_label = DECODE_LABEL(code, i, next_off, &next_off);
                 next_off++; //skip extended list tag
                 int size;
                 DECODE_INTEGER(size, code, i, next_off, next_off)
@@ -1413,8 +1381,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     for (int j = 0; j < size / 2; j++) {
                         int cmp_value;
                         DECODE_INTEGER(cmp_value, code, i, next_off, next_off)
-                        int jmp_label;
-                        DECODE_LABEL(jmp_label, code, i, next_off, next_off)
+                        int jmp_label = DECODE_LABEL(code, i, next_off, &next_off);
 
                             //TODO: check if src_value is a tuple
                             if (!jump_to_address && (arity == cmp_value)) {
@@ -1433,9 +1400,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             }
 
             case OP_JUMP: {
-                int label;
                 int next_offset = 1;
-                DECODE_LABEL(label, code, i, next_offset, next_offset)
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                     remaining_reductions--;
                     if (LIKELY(remaining_reductions)) {
@@ -1702,8 +1668,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
            case OP_IS_FUNCTION: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -1775,8 +1740,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_MAKE_FUN2: {
                 int next_off = 1;
-                int fun_index;
-                DECODE_LABEL(fun_index, code, i, next_off, next_off)
+                int fun_index = DECODE_LABEL(code, i, next_off, &next_off);
 
                     term f = make_fun(ctx, mod, fun_index);
                     if (term_is_invalid_term(f)) {
@@ -1794,8 +1758,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
 
                     term catch_term = term_from_catch_label(mod->module_index, label);
                     //TODO: here just write to y registers is enough
@@ -1870,8 +1833,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                 dreg_t dreg;
                 dreg_type_t dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
 
                     term catch_term = term_from_catch_label(mod->module_index, label);
                     // TODO: here just write to y registers is enough
@@ -1928,8 +1890,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_ADD: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src1;
                 DECODE_COMPACT_TERM(src1, code, i, next_off, next_off);
                 term src2;
@@ -1952,8 +1913,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_INIT2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term size;
                 DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
                 avm_int_t words;
@@ -1988,8 +1948,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_INIT_BITS: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term size;
                 DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
                 int words;
@@ -2029,8 +1988,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_APPEND: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term size;
                 DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
                 term extra;
@@ -2084,8 +2042,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_PUT_INTEGER: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term size;
                 DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
                 avm_int_t unit;
@@ -2118,8 +2075,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_PUT_BINARY: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 int size;
                 DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
                 avm_int_t unit;
@@ -2192,8 +2148,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_START_MATCH2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                     int next_off_back = next_off;
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
@@ -2232,8 +2187,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                     }
 
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 term live;
@@ -2340,8 +2294,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_MATCH_STRING: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 avm_int_t bits;
@@ -2426,8 +2379,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_SKIP_BITS2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 term size;
@@ -2461,8 +2413,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_TEST_UNIT: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 avm_int_t unit;
@@ -2481,8 +2432,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_TEST_TAIL2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 avm_int_t bits;
@@ -2503,8 +2453,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_GET_INTEGER2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 term arg2;
@@ -2549,8 +2498,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_BS_GET_BINARY2: {
                 int next_off = 1;
-                int fail;
-                DECODE_LABEL(fail, code, i, next_off, next_off)
+                int fail = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 int src_offset = next_off;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
@@ -2745,8 +2693,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_BOOLEAN: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -2761,8 +2708,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_FUNCTION2: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 unsigned int arity;
@@ -2804,8 +2750,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_GC_BIF1: {
                 int next_off = 1;
-                int f_label;
-                DECODE_LABEL(f_label, code, i, next_off, next_off);
+                int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
@@ -2832,8 +2777,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_GC_BIF2: {
                 int next_off = 1;
-                int f_label;
-                DECODE_LABEL(f_label, code, i, next_off, next_off);
+                int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
@@ -2862,10 +2806,9 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             //TODO: stub, always false
             case OP_IS_BITSTR: {
-                int label;
                 term arg1;
                 int next_off = 1;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
                     if (0) {
@@ -2879,8 +2822,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_GC_BIF3: {
                 int next_off = 1;
-                int f_label;
-                DECODE_LABEL(f_label, code, i, next_off, next_off);
+                int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live;
                 DECODE_INTEGER(live, code, i, next_off, next_off);
                 int bif;
@@ -2928,8 +2870,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //it looks like it can be safely left unimplemented
             case OP_RECV_MARK: {
                 int next_offset = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_offset, next_offset);
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                 NEXT_INSTRUCTION(next_offset);
                 break;
@@ -2939,8 +2880,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
             //it looks like it can be safely left unimplemented
             case OP_RECV_SET: {
                 int next_offset = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_offset, next_offset);
+                int label = DECODE_LABEL(code, i, next_offset, &next_offset);
 
                 NEXT_INSTRUCTION(next_offset);
                 break;
@@ -2957,8 +2897,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_PUT_MAP_ASSOC: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 int src_offset = next_off;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
@@ -3061,8 +3000,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_PUT_MAP_EXACT: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 int src_offset = next_off;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
@@ -3123,8 +3061,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_MAP: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
 
@@ -3139,8 +3076,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_HAS_MAP_FIELDS: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
@@ -3166,8 +3102,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_GET_MAP_ELEMENTS: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term src;
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
 
@@ -3200,8 +3135,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_IS_TAGGED_TUPLE: {
                 int next_off = 1;
-                int label;
-                DECODE_LABEL(label, code, i, next_off, next_off)
+                int label = DECODE_LABEL(code, i, next_off, &next_off);
                 term arg1;
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 int arity;

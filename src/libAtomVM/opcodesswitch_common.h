@@ -25,27 +25,24 @@ typedef union
     int reg_type;
 } dreg_type_t;
 
-#define DECODE_LABEL(label, code_chunk, base_index, off, next_operand_offset)                        \
-    {                                                                                                \
-        uint8_t first_byte = (code_chunk[(base_index) + (off)]);                                     \
-        switch (((first_byte) >> 3) & 0x3) {                                                         \
-            case 0:                                                                                  \
-            case 2:                                                                                  \
-                label = first_byte >> 4;                                                             \
-                next_operand_offset += 1;                                                            \
-                break;                                                                               \
-                                                                                                     \
-            case 1:                                                                                  \
-                label = ((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1];           \
-                next_operand_offset += 2;                                                            \
-                break;                                                                               \
-                                                                                                     \
-            default:                                                                                 \
-                fprintf(stderr, "Operand not a label: %x, or unsupported encoding\n", (first_byte)); \
-                AVM_ABORT();                                                                         \
-                break;                                                                               \
-        }                                                                                            \
+static int DECODE_LABEL(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+{
+    uint8_t first_byte = (code_chunk[(base_index) + (off)]);
+    switch (((first_byte) >> 3) & 0x3) {
+        case 0:
+        case 2:
+            *next_operand_offset += 1;
+            return first_byte >> 4;
+
+        case 1:
+            *next_operand_offset += 2;
+            return ((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1];
+
+        default:
+            fprintf(stderr, "Operand not a label: %x, or unsupported encoding\n", (first_byte));
+            AVM_ABORT();
     }
+}
 
 #define DECODE_ATOM(atom, code_chunk, base_index, off, next_operand_offset)                          \
     {                                                                                                \
