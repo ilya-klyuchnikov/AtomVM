@@ -26,6 +26,7 @@
 #include "externalterm.h"
 #include "iff.h"
 #include "nifs.h"
+#include "opcodesswitch_common.h"
 #include "utils.h"
 
 #include <stdio.h>
@@ -130,24 +131,24 @@ static void module_add_label(Module *mod, int index, void *ptr);
     }                                                                                   \
 }
 
-#define DECODE_DEST_REGISTER(dreg, dreg_type, code_chunk, base_index, off, next_operand_offset)     \
-{                                                                                                   \
-    uint8_t first_byte = code_chunk[(base_index) + (off)];                                          \
-    uint8_t reg_type = first_byte & 0xF;                                                            \
-    (dreg_type).reg_type = reg_type;                                                                \
-    switch (reg_type) {                                                                             \
-        case COMPACT_XREG:                                                                          \
-        case COMPACT_YREG:                                                                          \
-            (dreg) = code_chunk[(base_index) + (off)] >> 4;                                         \
-            next_operand_offset += 1;                                                               \
-            break;                                                                                  \
-        case COMPACT_LARGE_YREG:                                                                    \
-            (dreg) = (((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1]);           \
-            next_operand_offset += 2;                                                               \
-            break;                                                                                  \
-        default:                                                                                    \
-            AVM_ABORT();                                                                            \
-    }                                                                                               \
+static void DECODE_DEST_REGISTER(dreg_t *dreg, dreg_type_t *dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+{
+    uint8_t first_byte = code_chunk[(base_index) + (off)];
+    uint8_t reg_type = first_byte & 0xF;
+    (*dreg_type).reg_type = reg_type;
+    switch (reg_type) {
+        case COMPACT_XREG:
+        case COMPACT_YREG:
+            (*dreg) = code_chunk[(base_index) + (off)] >> 4;
+            *next_operand_offset += 1;
+            break;
+        case COMPACT_LARGE_YREG:
+            (*dreg) = (((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1]);
+            *next_operand_offset += 2;
+            break;
+        default:
+            AVM_ABORT();
+    }
 }
 
 #define IMPL_CODE_LOADER 1

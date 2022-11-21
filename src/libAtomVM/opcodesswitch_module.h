@@ -129,7 +129,7 @@ int read_core_chunk(Module *mod)
                 int bif = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -144,7 +144,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(arg1);
 
@@ -163,7 +163,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(arg1);
                 UNUSED(arg2);
@@ -262,7 +262,7 @@ int read_core_chunk(Module *mod)
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
 
@@ -612,7 +612,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(src_value)
 
@@ -626,10 +626,10 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t head_dreg;
                 dreg_type_t head_dreg_type;
-                DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off);
                 dreg_t tail_dreg;
                 dreg_type_t tail_dreg_type;
-                DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(src_value)
 
@@ -644,7 +644,7 @@ int read_core_chunk(Module *mod)
                 int element = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(src_value)
 
@@ -676,7 +676,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(tail, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(head);
                 UNUSED(tail);
@@ -690,7 +690,7 @@ int read_core_chunk(Module *mod)
                 int size = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 for (int j = 0; j < size; j++) {
                     if (code[i + next_off] != OP_PUT) {
@@ -777,7 +777,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -788,7 +788,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -798,7 +798,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -833,7 +833,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -844,7 +844,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -860,7 +860,7 @@ int read_core_chunk(Module *mod)
                 avm_int_t unit = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -880,7 +880,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -897,7 +897,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -923,7 +923,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -979,7 +979,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(slots_term, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -994,7 +994,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1006,7 +1006,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
@@ -1021,7 +1021,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 term live;
                 DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
 
@@ -1126,7 +1126,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1147,7 +1147,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1157,7 +1157,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1214,7 +1214,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(f_label)
                 UNUSED(live)
@@ -1239,7 +1239,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(f_label)
                 UNUSED(live)
@@ -1280,7 +1280,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg3, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(f_label)
                 UNUSED(live)
@@ -1343,7 +1343,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 int live = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
 
                 next_off++; // skip extended list tag {z, 1}
@@ -1372,7 +1372,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 int live = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
 
                 next_off++; // skip extended list tag {z, 1}
@@ -1439,7 +1439,7 @@ int read_core_chunk(Module *mod)
                     DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
                     dreg_t dreg;
                     dreg_type_t dreg_type;
-                    DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                    DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 }
                 if (!fail) {
                     NEXT_INSTRUCTION(next_off);
@@ -1468,7 +1468,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t head_dreg;
                 dreg_type_t head_dreg_type;
-                DECODE_DEST_REGISTER(head_dreg, head_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(src_value)
 
@@ -1482,7 +1482,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
                 dreg_t tail_dreg;
                 dreg_type_t tail_dreg_type;
-                DECODE_DEST_REGISTER(tail_dreg, tail_dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off);
 
                 UNUSED(src_value)
 
@@ -1494,7 +1494,7 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 next_off++; // skip extended list tag
                 int size = DECODE_INTEGER_FUN(code, i, next_off, &next_off);
 
@@ -1515,10 +1515,10 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 dreg_t reg_a;
                 dreg_type_t reg_a_type;
-                DECODE_DEST_REGISTER(reg_a, reg_a_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
                 dreg_t reg_b;
                 dreg_type_t reg_b_type;
-                DECODE_DEST_REGISTER(reg_b, reg_b_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&reg_b, &reg_b_type, code, i, next_off, &next_off);
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -1535,7 +1535,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
                 dreg_t dreg;
                 dreg_type_t dreg_type;
-                DECODE_DEST_REGISTER(dreg, dreg_type, code, i, next_off, next_off);
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
