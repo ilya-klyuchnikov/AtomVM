@@ -60,10 +60,8 @@ int read_core_chunk(Module *mod)
 
             case OP_FUNC_INFO: {
                 int next_offset = 1;
-                int module_atom;
-                DECODE_ATOM(module_atom, code, i, next_offset, next_offset)
-                int function_name_atom;
-                DECODE_ATOM(function_name_atom, code, i, next_offset, next_offset)
+                int module_atom = DECODE_ATOM(code, i, next_offset, &next_offset);
+                int function_name_atom = DECODE_ATOM(code, i, next_offset, &next_offset);
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_offset, next_offset);
 
@@ -1529,8 +1527,7 @@ int read_core_chunk(Module *mod)
                 DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
                 int arity;
                 DECODE_INTEGER(arity, code, i, next_off, next_off)
-                int tag_atom_id;
-                DECODE_ATOM(tag_atom_id, code, i, next_off, next_off)
+                int tag_atom_id = DECODE_ATOM(code, i, next_off, &next_off);
 
                 UNUSED(label)
                 UNUSED(arg1)
