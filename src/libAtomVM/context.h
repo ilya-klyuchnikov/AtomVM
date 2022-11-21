@@ -156,7 +156,7 @@ void context_destroy(Context *c);
  * @param the function arity (number of arguments that are required).
  * @returns 1 if an error occurred, otherwise 0 is always returned.
  */
-int context_execute_loop(Context *ctx, Module *mod, const char *function_name, int arity);
+int context_execute_loop(Context *ctx, Module *mod, const char *function_name, int function_arity);
 
 /**
  * @brief Returns 1 if the context is a port driver

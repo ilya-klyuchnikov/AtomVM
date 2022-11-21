@@ -413,7 +413,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 #endif
 #endif
 
-        HOT_FUNC int context_execute_loop(Context *ctx, Module *mod, const char *function_name, int arity)
+        HOT_FUNC int context_execute_loop(Context *ctx, Module *mod, const char *function_name, int function_arity)
 {
     uint8_t *code = mod->code->code;
         term *x_regs = ctx->x;
@@ -425,16 +425,16 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
         tmp_atom_name[0] = function_len;
         memcpy(tmp_atom_name + 1, function_name, function_len);
 
-        int label = module_search_exported_function(mod, tmp_atom_name, arity);
+        int function_label = module_search_exported_function(mod, tmp_atom_name, function_arity);
         free(tmp_atom_name);
 
-        if (UNLIKELY(!label)) {
-            fprintf(stderr, "No %s/%i function found.\n", function_name, arity);
+        if (UNLIKELY(!function_label)) {
+            fprintf(stderr, "No %s/%i function found.\n", function_name, function_arity);
             return 0;
         }
 
         ctx->cp = module_address(mod->module_index, mod->end_instruction_ii);
-        JUMP_TO_ADDRESS(mod->labels[label]);
+        JUMP_TO_ADDRESS(mod->labels[function_label]);
 
         int remaining_reductions = DEFAULT_REDUCTIONS_AMOUNT;
 
@@ -1582,7 +1582,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                         struct Nif *nif = (struct Nif *) nifs_get(module_name, function_name, fun_arity);
                         if (!IS_NULL_PTR(nif)) {
-                            term return_value = nif->nif_ptr(ctx, arity, ctx->x);
+                            term return_value = nif->nif_ptr(ctx, function_arity, ctx->x);
                             if (UNLIKELY(term_is_invalid_term(return_value))) {
                                 HANDLE_ERROR();
                             }
@@ -1595,7 +1595,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
                             if (IS_NULL_PTR(fun_module)) {
                                 HANDLE_ERROR();
                             }
-                            label = module_search_exported_function(fun_module, function_name, arity);
+                            label = module_search_exported_function(fun_module, function_name, function_arity);
                             if (UNLIKELY(label == 0)) {
                                 HANDLE_ERROR();
                             }
