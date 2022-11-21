@@ -55,7 +55,7 @@ static int DECODE_ATOM(const uint8_t *code_chunk, unsigned int base_index, int o
     }
 }
 
-static int DECODE_INTEGER_FUN(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+static int DECODE_INTEGER(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
 {
     uint8_t first_byte = (code_chunk[(base_index) + (off)]);
     switch (((first_byte) >> 3) & 0x3) {
