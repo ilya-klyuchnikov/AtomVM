@@ -19,12 +19,6 @@
 
 typedef int dreg_t;
 
-typedef union
-{
-    term **ptr;
-    int reg_type;
-} dreg_type_t;
-
 static int DECODE_LABEL(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
 {
     uint8_t first_byte = (code_chunk[(base_index) + (off)]);

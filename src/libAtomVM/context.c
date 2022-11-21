@@ -153,33 +153,33 @@
     }                                                                                                                   \
 }
 
-#define READ_DEST_REGISTER(dreg_type, dreg) \
-    *(*((dreg_type).ptr) + (dreg));
+#define READ_DEST_REGISTER(ptr, dreg) \
+    *(*(ptr) + (dreg));
 
 
-#define WRITE_REGISTER(dreg_type, dreg, value)                                                      \
+#define WRITE_REGISTER(ptr, dreg, value)                                                      \
 {                                                                                                   \
-    *(*((dreg_type).ptr) + (dreg)) = value;                                                         \
+    *(*(ptr) + (dreg)) = value;                                                         \
 }
 
-static void DECODE_DEST_REGISTER(dreg_t *dreg, dreg_type_t *dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset, term **x_regs, Context *ctx){
+static void DECODE_DEST_REGISTER(dreg_t *dreg, term ***dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset, term **x_regs, Context *ctx){
     uint8_t first_byte = code_chunk[(base_index) + (off)];
     uint8_t reg_type = first_byte & 0xF;
     uint8_t reg_index = (first_byte >> 4);
     switch (reg_type) {
         case COMPACT_XREG:
-            (*dreg_type).ptr = x_regs;
+            *dreg_type = x_regs;
             (*dreg) = reg_index;
             *next_operand_offset += 1;
             break;
         case COMPACT_YREG:
-            (*dreg_type).ptr = &ctx->e;
+            *dreg_type = &ctx->e;
             (*dreg) = reg_index;
             *next_operand_offset += 1;
             break;
         case COMPACT_LARGE_YREG:
             if (LIKELY((first_byte & COMPACT_LARGE_IMM_MASK) == COMPACT_11BITS_VALUE)) {
-                (*dreg_type).ptr = &ctx->e;
+                *dreg_type = &ctx->e;
                 (*dreg) = (((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1]);
                 *next_operand_offset += 2;
             } else {
