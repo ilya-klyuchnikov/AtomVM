@@ -153,13 +153,14 @@
     }                                                                                                                   \
 }
 
-#define READ_DEST_REGISTER(ptr, dreg) \
-    *(*(ptr) + (dreg));
+static term READ_DEST_REGISTER(term **ptr, dreg_t dreg)
+{
+    return *(*(ptr) + (dreg));
+}
 
-
-#define WRITE_REGISTER(ptr, dreg, value)                                                      \
-{                                                                                                   \
-    *(*(ptr) + (dreg)) = value;                                                         \
+static void WRITE_REGISTER(term **ptr, dreg_t dreg, term value)
+{
+    *(*(ptr) + (dreg)) = value;
 }
 
 static void DECODE_DEST_REGISTER(dreg_t *dreg, term ***dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset, term **x_regs, Context *ctx){
