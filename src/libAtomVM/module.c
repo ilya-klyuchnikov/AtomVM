@@ -131,11 +131,11 @@ static void module_add_label(Module *mod, int index, void *ptr);
     }                                                                                   \
 }
 
-static void DECODE_DEST_REGISTER(dreg_t *dreg, dreg_type_t *dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+static void DECODE_DEST_REGISTER(dreg_t *dreg, int *dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
 {
     uint8_t first_byte = code_chunk[(base_index) + (off)];
     uint8_t reg_type = first_byte & 0xF;
-    (*dreg_type).reg_type = reg_type;
+    *dreg_type = reg_type;
     switch (reg_type) {
         case COMPACT_XREG:
         case COMPACT_YREG:
