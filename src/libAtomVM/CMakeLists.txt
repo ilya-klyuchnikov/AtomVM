@@ -44,7 +44,6 @@ set(HEADER_FILES
     opcodes.h
     opcodesswitch.h
     opcodesswitch_common.h
-    opcodesswitch_module.h
     overflow_helpers.h
     nifs.h
     platform_nifs.h
