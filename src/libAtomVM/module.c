@@ -47,10 +47,7 @@ static void module_add_label(Module *mod, int index, void *ptr);
 static enum ModuleLoadResult module_build_imported_functions_table(Module *this_module, uint8_t *table_data);
 static void module_add_label(Module *mod, int index, void *ptr);
 
-#define T_DEST_REG(dreg_type, dreg) \
-    reg_type_c((dreg_type).reg_type), ((dreg))
-
-#define DECODE_COMPACT_TERM(dest_term, code_chunk, base_index, off, next_operand_offset)\
+#define DECODE_COMPACT_TERM(code_chunk, base_index, off, next_operand_offset)\
 {                                                                                       \
     uint8_t first_byte = (code_chunk[(base_index) + (off)]);                            \
     switch (first_byte & 0xF) {                                                         \
@@ -59,12 +56,10 @@ static void module_add_label(Module *mod, int index, void *ptr);
             switch (((first_byte) >> 3) & 0x3) {                                        \
                 case 0:                                                                 \
                 case 2:                                                                 \
-                    dest_term = term_from_int4(first_byte >> 4);                        \
                     next_operand_offset += 1;                                           \
                     break;                                                              \
                                                                                         \
                 case 1:                                                                 \
-                    dest_term = term_from_int4(((first_byte & 0xE0) << 3) | code_chunk[(base_index) + (off) + 1]); \
                     next_operand_offset += 2;                                           \
                     break;                                                              \
                                                                                         \

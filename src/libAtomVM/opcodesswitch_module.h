@@ -140,13 +140,10 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 int fail_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int bif = DECODE_INTEGER(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(arg1);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -157,16 +154,11 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 int fail_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int bif = DECODE_INTEGER(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(arg1);
-                UNUSED(arg2);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -291,10 +283,7 @@ int read_core_chunk(Module *mod)
             case OP_WAIT_TIMEOUT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term timeout;
-                DECODE_COMPACT_TERM(timeout, code, i, next_off, next_off)
-
-                UNUSED(timeout)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
 
@@ -304,13 +293,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_LT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -319,28 +304,20 @@ int read_core_chunk(Module *mod)
             case OP_IS_GE: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IS_EQUAL: {
-                term arg1;
-                term arg2;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -349,28 +326,20 @@ int read_core_chunk(Module *mod)
             case OP_IS_NOT_EQUAL: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IS_EQ_EXACT: {
-                term arg1;
-                term arg2;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -378,13 +347,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_NOT_EQ_EXACT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
-                UNUSED(arg2)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -393,11 +358,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_INTEGER: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -406,11 +369,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_FLOAT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -419,11 +380,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_NUMBER: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -432,10 +391,8 @@ int read_core_chunk(Module *mod)
             case OP_IS_BINARY: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -444,46 +401,38 @@ int read_core_chunk(Module *mod)
             case OP_IS_LIST: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IS_NONEMPTY_LIST: {
-                term arg1;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IS_NIL: {
-                term arg1;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
             }
 
             case OP_IS_ATOM: {
-                term arg1;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -492,47 +441,35 @@ int read_core_chunk(Module *mod)
             case OP_IS_PID: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-
-                UNUSED(arg1)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 NEXT_INSTRUCTION(next_off);
-
                 break;
             }
 
             case OP_IS_REFERENCE: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
-
                 break;
             }
 
             case OP_IS_PORT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
-
                 break;
             }
 
             case OP_IS_TUPLE: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(label)
-                UNUSED(arg1)
+                UNUSED(label);
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -541,12 +478,10 @@ int read_core_chunk(Module *mod)
             case OP_TEST_ARITY: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 int arity = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -554,20 +489,14 @@ int read_core_chunk(Module *mod)
 
             case OP_SELECT_VAL: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 int default_label = DECODE_LABEL(code, i, next_off, &next_off);
                 next_off++; // skip extended list tag
                 int size = DECODE_INTEGER(code, i, next_off, &next_off);
 
-                UNUSED(src_value);
-
                 for (int j = 0; j < size / 2; j++) {
-                    term cmp_value;
-                    DECODE_COMPACT_TERM(cmp_value, code, i, next_off, next_off)
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                     int jmp_label = DECODE_LABEL(code, i, next_off, &next_off);
-
-                    UNUSED(cmp_value);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -577,19 +506,14 @@ int read_core_chunk(Module *mod)
 
             case OP_SELECT_TUPLE_ARITY: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 int default_label = DECODE_LABEL(code, i, next_off, &next_off);
                 next_off++; // skip extended list tag
                 int size = DECODE_INTEGER(code, i, next_off, &next_off);
 
-                UNUSED(src_value);
-
                 for (int j = 0; j < size / 2; j++) {
                     int cmp_value = DECODE_INTEGER(code, i, next_off, &next_off);
                     int jmp_label = DECODE_LABEL(code, i, next_off, &next_off);
-
-                    UNUSED(cmp_value);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -608,22 +532,17 @@ int read_core_chunk(Module *mod)
 
             case OP_MOVE: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(src_value)
-
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
 
             case OP_GET_LIST: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t head_dreg;
                 int head_dreg_type;
                 DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off);
@@ -631,22 +550,17 @@ int read_core_chunk(Module *mod)
                 int tail_dreg_type;
                 DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off);
 
-                UNUSED(src_value)
-
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
 
             case OP_GET_TUPLE_ELEMENT: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 int element = DECODE_INTEGER(code, i, next_off, &next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -654,15 +568,11 @@ int read_core_chunk(Module *mod)
 
             case OP_SET_TUPLE_ELEMENT: {
                 int next_off = 1;
-                term new_element;
-                DECODE_COMPACT_TERM(new_element, code, i, next_off, next_off);
-                term tuple;
-                DECODE_COMPACT_TERM(tuple, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 int position = DECODE_INTEGER(code, i, next_off, &next_off);
 
-                UNUSED(tuple);
                 UNUSED(position);
-                UNUSED(new_element);
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -670,16 +580,11 @@ int read_core_chunk(Module *mod)
             case OP_PUT_LIST: {
 
                 int next_off = 1;
-                term head;
-                DECODE_COMPACT_TERM(head, code, i, next_off, next_off);
-                term tail;
-                DECODE_COMPACT_TERM(tail, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(head);
-                UNUSED(tail);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -698,9 +603,7 @@ int read_core_chunk(Module *mod)
                         AVM_ABORT();
                     }
                     next_off++;
-                    term put_value;
-                    DECODE_COMPACT_TERM(put_value, code, i, next_off, next_off);
-                    UNUSED(put_value);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -709,8 +612,7 @@ int read_core_chunk(Module *mod)
 
             case OP_BADMATCH: {
                 int next_off = 1;
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
 
@@ -725,8 +627,7 @@ int read_core_chunk(Module *mod)
 
             case OP_CASE_END: {
                 int next_off = 1;
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
 
                 NEXT_INSTRUCTION(next_off);
 
@@ -745,11 +646,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_FUNCTION: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -806,25 +705,15 @@ int read_core_chunk(Module *mod)
 
             case OP_TRY_CASE_END: {
                 int next_off = 1;
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
-
-                UNUSED(arg1);
-
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
 
             case OP_RAISE: {
                 int next_off = 1;
-                term stacktrace;
-                DECODE_COMPACT_TERM(stacktrace, code, i, next_off, next_off);
-                UNUSED(stacktrace);
-                term exc_value;
-                DECODE_COMPACT_TERM(exc_value, code, i, next_off, next_off);
-
-                UNUSED(exc_value);
-
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 NEXT_INSTRUCTION(next_off);
                 break;
             }
@@ -853,10 +742,8 @@ int read_core_chunk(Module *mod)
             case OP_BS_ADD: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src1;
-                DECODE_COMPACT_TERM(src1, code, i, next_off, next_off);
-                term src2;
-                DECODE_COMPACT_TERM(src2, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
                 dreg_t dreg;
                 int dreg_type;
@@ -869,15 +756,12 @@ int read_core_chunk(Module *mod)
             case OP_BS_INIT2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t words = DECODE_INTEGER(code, i, next_off, &next_off);
                 UNUSED(words);
                 avm_int_t regs = DECODE_INTEGER(code, i, next_off, &next_off);
                 UNUSED(regs);
-                term flags;
-                UNUSED(flags);
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -889,12 +773,10 @@ int read_core_chunk(Module *mod)
             case OP_BS_INIT_BITS: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
                 int words = DECODE_INTEGER(code, i, next_off, &next_off);
                 int regs = DECODE_INTEGER(code, i, next_off, &next_off);
-                term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -906,21 +788,12 @@ int read_core_chunk(Module *mod)
             case OP_BS_APPEND: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
-                term extra;
-                UNUSED(extra);
-                DECODE_COMPACT_TERM(extra, code, i, next_off, next_off)
-                term live;
-                UNUSED(live);
-                DECODE_COMPACT_TERM(live, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
-                term src;
-                int src_off = next_off;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off)
-                term flags;
-                UNUSED(flags);
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -932,13 +805,10 @@ int read_core_chunk(Module *mod)
             case OP_BS_PUT_INTEGER: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
-                term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -947,13 +817,10 @@ int read_core_chunk(Module *mod)
             case OP_BS_PUT_BINARY: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                int size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
-                term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -971,12 +838,9 @@ int read_core_chunk(Module *mod)
             case OP_BS_START_MATCH2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
-                term slots_term;
-                DECODE_COMPACT_TERM(slots_term, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -988,10 +852,8 @@ int read_core_chunk(Module *mod)
             case OP_BS_START_MATCH3: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term live;
-                DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1002,13 +864,11 @@ int read_core_chunk(Module *mod)
 
             case OP_BS_GET_POSITION: {
                 int next_off = 1;
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-                term live;
-                DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1017,13 +877,11 @@ int read_core_chunk(Module *mod)
             case OP_BS_GET_TAIL: {
                 int next_off = 1;
                 term src;
-                int src_off = next_off;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
-                term live;
-                DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1031,10 +889,8 @@ int read_core_chunk(Module *mod)
 
             case OP_BS_SET_POSITION: {
                 int next_off = 1;
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term pos;
-                DECODE_COMPACT_TERM(pos, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1043,8 +899,7 @@ int read_core_chunk(Module *mod)
             case OP_BS_MATCH_STRING: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t bits = DECODE_INTEGER(code, i, next_off, &next_off);
                 avm_int_t offset = DECODE_INTEGER(code, i, next_off, &next_off);
 
@@ -1055,10 +910,8 @@ int read_core_chunk(Module *mod)
 
             case OP_BS_SAVE2: {
                 int next_off = 1;
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term index = 0;
-                DECODE_COMPACT_TERM(index, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1066,10 +919,8 @@ int read_core_chunk(Module *mod)
 
             case OP_BS_RESTORE2: {
                 int next_off = 1;
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term index = 0;
-                DECODE_COMPACT_TERM(index, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1078,13 +929,10 @@ int read_core_chunk(Module *mod)
             case OP_BS_SKIP_BITS2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
-                term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1093,8 +941,7 @@ int read_core_chunk(Module *mod)
             case OP_BS_TEST_UNIT: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -1104,8 +951,7 @@ int read_core_chunk(Module *mod)
             case OP_BS_TEST_TAIL2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t bits = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -1115,15 +961,11 @@ int read_core_chunk(Module *mod)
             case OP_BS_GET_INTEGER2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
-                term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1135,16 +977,13 @@ int read_core_chunk(Module *mod)
             case OP_BS_GET_BINARY2: {
                 int next_off = 1;
                 int fail = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
                 int src_offset = next_off;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
-                term size;
-                DECODE_COMPACT_TERM(size, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 avm_int_t unit = DECODE_INTEGER(code, i, next_off, &next_off);
                 term flags;
-                DECODE_COMPACT_TERM(flags, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1181,11 +1020,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_BOOLEAN: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -1194,12 +1031,10 @@ int read_core_chunk(Module *mod)
             case OP_IS_FUNCTION2: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 unsigned int arity = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -1210,8 +1045,7 @@ int read_core_chunk(Module *mod)
                 int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
                 int bif = DECODE_INTEGER(code, i, next_off, &next_off); // s?
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1219,7 +1053,6 @@ int read_core_chunk(Module *mod)
                 UNUSED(f_label)
                 UNUSED(live)
                 UNUSED(bif)
-                UNUSED(arg1)
                 UNUSED(dreg)
 
                 UNUSED(f_label)
@@ -1233,10 +1066,8 @@ int read_core_chunk(Module *mod)
                 int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
                 int bif = DECODE_INTEGER(code, i, next_off, &next_off); // s?
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1244,8 +1075,6 @@ int read_core_chunk(Module *mod)
                 UNUSED(f_label)
                 UNUSED(live)
                 UNUSED(bif)
-                UNUSED(arg1)
-                UNUSED(arg2)
                 UNUSED(dreg)
 
                 UNUSED(f_label)
@@ -1256,12 +1085,10 @@ int read_core_chunk(Module *mod)
 
             // TODO: stub, always false
             case OP_IS_BITSTR: {
-                term arg1;
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -1272,12 +1099,9 @@ int read_core_chunk(Module *mod)
                 int f_label = DECODE_LABEL(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
                 int bif = DECODE_INTEGER(code, i, next_off, &next_off); // s?
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
-                term arg2;
-                DECODE_COMPACT_TERM(arg2, code, i, next_off, next_off);
-                term arg3;
-                DECODE_COMPACT_TERM(arg3, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1285,9 +1109,6 @@ int read_core_chunk(Module *mod)
                 UNUSED(f_label)
                 UNUSED(live)
                 UNUSED(bif)
-                UNUSED(arg1)
-                UNUSED(arg2)
-                UNUSED(arg3)
                 UNUSED(dreg)
 
                 UNUSED(f_label)
@@ -1338,9 +1159,8 @@ int read_core_chunk(Module *mod)
             case OP_PUT_MAP_ASSOC: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
                 int src_offset = next_off;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1355,9 +1175,8 @@ int read_core_chunk(Module *mod)
                 //
                 unsigned new_entries = 0;
                 for (int j = 0; j < num_elements; ++j) {
-                    term key, value;
-                    DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
-                    DECODE_COMPACT_TERM(value, code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 }
                 NEXT_INSTRUCTION(next_off);
 
@@ -1367,9 +1186,7 @@ int read_core_chunk(Module *mod)
             case OP_PUT_MAP_EXACT: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                int src_offset = next_off;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1383,9 +1200,8 @@ int read_core_chunk(Module *mod)
                 // Make sure every key from list is in src
                 //
                 for (int j = 0; j < num_elements; ++j) {
-                    term key, value;
-                    DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
-                    DECODE_COMPACT_TERM(value, code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 }
                 NEXT_INSTRUCTION(next_off);
 
@@ -1395,11 +1211,9 @@ int read_core_chunk(Module *mod)
             case OP_IS_MAP: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -1408,15 +1222,13 @@ int read_core_chunk(Module *mod)
             case OP_HAS_MAP_FIELDS: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 next_off++; // skip extended list tag {z, 1}
                 int list_len = DECODE_INTEGER(code, i, next_off, &next_off);
                 int fail = 0;
                 for (int j = 0; j < list_len && !fail; ++j) {
-                    term key;
-                    DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 }
                 if (!fail) {
                     NEXT_INSTRUCTION(next_off);
@@ -1427,16 +1239,14 @@ int read_core_chunk(Module *mod)
             case OP_GET_MAP_ELEMENTS: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
 
                 next_off++; // skip extended list tag {z, 1}
                 int list_len = DECODE_INTEGER(code, i, next_off, &next_off);
                 int num_elements = list_len / 2;
                 int fail = 0;
                 for (int j = 0; j < num_elements && !fail; ++j) {
-                    term key;
-                    DECODE_COMPACT_TERM(key, code, i, next_off, next_off);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                     dreg_t dreg;
                     int dreg_type;
                     DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
@@ -1450,13 +1260,11 @@ int read_core_chunk(Module *mod)
             case OP_IS_TAGGED_TUPLE: {
                 int next_off = 1;
                 int label = DECODE_LABEL(code, i, next_off, &next_off);
-                term arg1;
-                DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off)
                 int arity = DECODE_INTEGER(code, i, next_off, &next_off);
                 int tag_atom_id = DECODE_ATOM(code, i, next_off, &next_off);
 
                 UNUSED(label)
-                UNUSED(arg1)
                 NEXT_INSTRUCTION(next_off);
 
                 break;
@@ -1464,13 +1272,10 @@ int read_core_chunk(Module *mod)
 
             case OP_GET_HD: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t head_dreg;
                 int head_dreg_type;
                 DECODE_DEST_REGISTER(&head_dreg, &head_dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1478,13 +1283,10 @@ int read_core_chunk(Module *mod)
 
             case OP_GET_TL: {
                 int next_off = 1;
-                term src_value;
-                DECODE_COMPACT_TERM(src_value, code, i, next_off, next_off)
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t tail_dreg;
                 int tail_dreg_type;
                 DECODE_DEST_REGISTER(&tail_dreg, &tail_dreg_type, code, i, next_off, &next_off);
-
-                UNUSED(src_value)
 
                 NEXT_INSTRUCTION(next_off);
                 break;
@@ -1501,10 +1303,7 @@ int read_core_chunk(Module *mod)
                 UNUSED(dreg);
 
                 for (int j = 0; j < size; j++) {
-                    term element;
-                    DECODE_COMPACT_TERM(element, code, i, next_off, next_off)
-
-                    UNUSED(element);
+                    DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 }
 
                 NEXT_INSTRUCTION(next_off);
@@ -1527,12 +1326,9 @@ int read_core_chunk(Module *mod)
                 int next_off = 1;
                 // fail since OTP 23 might be either 'no_fail', 'resume' or a fail label
                 // we are ignoring this right now, but we might use it for future optimizations.
-                term fail;
-                DECODE_COMPACT_TERM(fail, code, i, next_off, next_off);
-                term live;
-                DECODE_COMPACT_TERM(live, code, i, next_off, next_off);
-                term src;
-                DECODE_COMPACT_TERM(src, code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
+                DECODE_COMPACT_TERM(code, i, next_off, next_off);
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
