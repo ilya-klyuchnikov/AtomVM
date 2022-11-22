@@ -291,8 +291,8 @@ int read_core_chunk(Module *mod)
 
             case OP_ALLOCATE_HEAP: {
                 int next_off = 1;
-                int stack_need = DECODE_INTEGER(code, i, next_off, &next_off);
-                int heap_need = DECODE_INTEGER(code, i, next_off, &next_off);
+                int stack_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
+                int heap_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -310,8 +310,8 @@ int read_core_chunk(Module *mod)
 
             case OP_ALLOCATE_HEAP_ZERO: {
                 int next_off = 1;
-                int stack_need = DECODE_INTEGER(code, i, next_off, &next_off);
-                int heap_need = DECODE_INTEGER(code, i, next_off, &next_off);
+                int stack_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
+                int heap_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
 
                 NEXT_INSTRUCTION(next_off);
@@ -320,9 +320,9 @@ int read_core_chunk(Module *mod)
 
             case OP_TEST_HEAP: {
                 int next_offset = 1;
-                unsigned int heap_need = DECODE_INTEGER(code, i, next_offset, &next_offset);
+                uint8_t first_byte = (code[(i) + (next_offset)]);
+                unsigned int heap_need = DECODE_ALLOC_LIST(code, i, next_offset, &next_offset);
                 int live_registers = DECODE_INTEGER(code, i, next_offset, &next_offset);
-
                 NEXT_INSTRUCTION(next_offset);
                 break;
             }
@@ -1448,6 +1448,73 @@ int read_core_chunk(Module *mod)
                 dreg_t dreg;
                 int dreg_type;
                 DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_INIT_YREGS: {
+                int next_off = 1;
+                next_off++; // skip extended list tag
+                int size = DECODE_INTEGER(code, i, next_off, &next_off);
+                for (int j = 0; j < size; j++) {
+                    DECODE_INTEGER(code, i, next_off, &next_off);
+                }
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_BIND: {
+                int next_off = 1;
+                dreg_t reg_a;
+                int reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
+                dreg_t reg_b;
+                int reg_b_type;
+                DECODE_DEST_REGISTER(&reg_b, &reg_b_type, code, i, next_off, &next_off);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_CLEAR: {
+                int next_off = 1;
+                dreg_t reg_a;
+                int reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_RESERVE: {
+                int next_off = 1;
+                dreg_t reg_a;
+                int reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_USE: {
+                int next_off = 1;
+                dreg_t reg_a;
+                int reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_MAKE_FUN3: {
+                int next_off = 1;
+                int fun_index = DECODE_LABEL(code, i, next_off, &next_off);
+                dreg_t reg_a;
+                int reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off);
+
+                next_off++; // skip extended list tag
+                int size = DECODE_INTEGER(code, i, next_off, &next_off);
+
+                for (int j = 0; j < size; j++) {
+                    DECODE_COMPACT_TERM(code, i, next_off, &next_off);
+                }
                 NEXT_INSTRUCTION(next_off);
                 break;
             }

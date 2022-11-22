@@ -28,6 +28,7 @@
 #include "exportedfunction.h"
 #include "nifs.h"
 #include "opcodes.h"
+#include "opcodes.h"
 #include "opcodesswitch_common.h"
 #include "scheduler.h"
 #include "utils.h"
@@ -718,8 +719,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_ALLOCATE_HEAP: {
                 int next_off = 1;
-                int stack_need = DECODE_INTEGER(code, i, next_off, &next_off);
-                int heap_need = DECODE_INTEGER(code, i, next_off, &next_off);
+                int stack_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
+                int heap_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
 
                     if (live > ctx->avail_registers) {
@@ -771,8 +772,8 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_ALLOCATE_HEAP_ZERO: {
                 int next_off = 1;
-                int stack_need = DECODE_INTEGER(code, i, next_off, &next_off);
-                int heap_need = DECODE_INTEGER(code, i, next_off, &next_off);
+                int stack_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
+                int heap_need = DECODE_ALLOC_LIST(code, i, next_off, &next_off);
                 int live = DECODE_INTEGER(code, i, next_off, &next_off);
 
                     if (live > ctx->avail_registers) {
@@ -799,7 +800,7 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
             case OP_TEST_HEAP: {
                 int next_offset = 1;
-                unsigned int heap_need = DECODE_INTEGER(code, i, next_offset, &next_offset);
+                unsigned int heap_need = DECODE_ALLOC_LIST(code, i, next_offset, &next_offset);
                 int live_registers = DECODE_INTEGER(code, i, next_offset, &next_offset);
 
                     size_t heap_free = context_avail_free_memory(ctx);
@@ -3181,6 +3182,95 @@ static bool maybe_call_native(Context *ctx, AtomString module_name, AtomString f
 
                 break;
             }
+
+            case OP_INIT_YREGS: {
+                int next_off = 1;
+                next_off++; // skip extended list tag
+                int size = DECODE_INTEGER(code, i, next_off, &next_off);
+                for (int j = 0; j < size; j++) {
+                    int target = DECODE_INTEGER(code, i, next_off, &next_off);
+                    ctx->e[target] = term_nil();
+                }
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_BIND: {
+                int next_off = 1;
+                dreg_t reg_a;
+                term **reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off, &x_regs, ctx);
+                dreg_t reg_b;
+                term **reg_b_type;
+                DECODE_DEST_REGISTER(&reg_b, &reg_b_type, code, i, next_off, &next_off, &x_regs, ctx);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_CLEAR: {
+                int next_off = 1;
+                dreg_t reg_a;
+                term **reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off, &x_regs, ctx);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_RESERVE: {
+                int next_off = 1;
+                dreg_t reg_a;
+                term **reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off, &x_regs, ctx);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_RECV_MARKER_USE: {
+                int next_off = 1;
+                dreg_t reg_a;
+                term **reg_a_type;
+                DECODE_DEST_REGISTER(&reg_a, &reg_a_type, code, i, next_off, &next_off, &x_regs, ctx);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
+            case OP_MAKE_FUN3: {
+                int next_off = 1;
+                int fun_index = DECODE_LABEL(code, i, next_off, &next_off);
+                dreg_t dreg;
+                term **dreg_type;
+                DECODE_DEST_REGISTER(&dreg, &dreg_type, code, i, next_off, &next_off, &x_regs, ctx);
+
+                next_off++; // skip extended list tag
+
+                //// copy start
+                uint32_t n_freeze = module_get_fun_freeze(mod, fun_index);
+
+                int size = 2 + n_freeze;
+                if (memory_ensure_free(ctx, size + 1) != MEMORY_GC_OK) {
+                    return term_invalid_term();
+                }
+                term *boxed_func = memory_heap_alloc(ctx, size + 1);
+
+                boxed_func[0] = (size << 6) | TERM_BOXED_FUN;
+                boxed_func[1] = (term) mod;
+                boxed_func[2] = term_from_int(fun_index);
+
+                int size_args = DECODE_INTEGER(code, i, next_off, &next_off);
+                for (int j = 0; j < size_args; j++) {
+                    term arg1;
+                    DECODE_COMPACT_TERM(arg1, code, i, next_off, next_off);
+                    boxed_func[3 + j] = arg1;
+                }
+
+                // boxing
+                term f = ((term) boxed_func) | TERM_BOXED_VALUE_TAG;
+
+                WRITE_REGISTER(dreg_type, dreg, f);
+                NEXT_INSTRUCTION(next_off);
+                break;
+            }
+
 
             default:
                 printf("Undecoded opcode: %i\n", code[i]);

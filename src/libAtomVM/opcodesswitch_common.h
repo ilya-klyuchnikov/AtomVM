@@ -74,5 +74,34 @@ static int DECODE_INTEGER(const uint8_t *code_chunk, unsigned int base_index, in
     }
 }
 
+static int DECODE_ALLOC_LIST(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+{
+    uint8_t first_byte = (code_chunk[(base_index) + (off)]);
+    int tag = first_byte & 0xF;
+    int size;
+    int result;
+    int chunk_size;
+    switch (first_byte & 0xF) {
+        case COMPACT_LITERAL:
+        case COMPACT_LARGE_LITERAL:
+            return DECODE_INTEGER(code_chunk, base_index, off, next_operand_offset);
+        case COMPACT_EXTENDED: {
+            *next_operand_offset += 1; // skip list tag
+            size = DECODE_INTEGER(code_chunk, base_index, *next_operand_offset, next_operand_offset);
+            result = 0;
+            for (int i = 0; i < size; i++) {
+                // tag
+                DECODE_INTEGER(code_chunk, base_index, *next_operand_offset, next_operand_offset);
+                chunk_size = DECODE_INTEGER(code_chunk, base_index, *next_operand_offset, next_operand_offset);
+                result += chunk_size;
+            }
+            return result;
+        }
+        default:
+            fprintf(stderr, "Operand not an integer: %x, or unsupported encoding\n", (tag));
+            AVM_ABORT();
+    }
+}
+
 #define NEXT_INSTRUCTION(operands_size) \
     i += operands_size
