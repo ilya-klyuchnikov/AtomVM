@@ -21,6 +21,7 @@
 #include "module.h"
 
 #include "atom.h"
+#include <assert.h>
 #include "bif.h"
 #include "context.h"
 #include "externalterm.h"
@@ -47,83 +48,83 @@ static void module_add_label(Module *mod, int index, void *ptr);
 static enum ModuleLoadResult module_build_imported_functions_table(Module *this_module, uint8_t *table_data);
 static void module_add_label(Module *mod, int index, void *ptr);
 
-#define DECODE_COMPACT_TERM(code_chunk, base_index, off, next_operand_offset)\
-{                                                                                       \
-    uint8_t first_byte = (code_chunk[(base_index) + (off)]);                            \
-    switch (first_byte & 0xF) {                                                         \
-        case COMPACT_LARGE_LITERAL:                                                     \
-        case COMPACT_LITERAL:                                                           \
-            switch (((first_byte) >> 3) & 0x3) {                                        \
-                case 0:                                                                 \
-                case 2:                                                                 \
-                    next_operand_offset += 1;                                           \
-                    break;                                                              \
-                                                                                        \
-                case 1:                                                                 \
-                    next_operand_offset += 2;                                           \
-                    break;                                                              \
-                                                                                        \
-                default:                                                                \
-                    fprintf(stderr, "Operand not literal: %x, or unsupported encoding\n", (first_byte)); \
-                    AVM_ABORT();                                                        \
-                    break;                                                              \
-            }                                                                           \
-            break;                                                                      \
-                                                                                        \
-        case COMPACT_SMALLINT4:                                                         \
-        case COMPACT_ATOM:                                                              \
-        case COMPACT_XREG:                                                              \
-        case COMPACT_YREG:                                                              \
-            next_operand_offset += 1;                                                   \
-            break;                                                                      \
-                                                                                        \
-        case COMPACT_EXTENDED:                                                          \
-            switch (first_byte) {                                                       \
-                case COMPACT_EXTENDED_LITERAL: {                                        \
-                    uint8_t ext = (code_chunk[(base_index) + (off) + 1] & 0xF);         \
-                    if (ext == 0) {                                                     \
-                        next_operand_offset += 2;                                       \
-                    }else if (ext == 0x8) {                                             \
-                        next_operand_offset += 3;                                       \
-                    } else {                                                            \
-                        AVM_ABORT();                                                    \
-                    }                                                                   \
-                    break;                                                              \
-                }                                                                       \
-                default:                                                                \
-                    printf("Unexpected %i\n", (int) first_byte);                        \
-                    AVM_ABORT();                                                        \
-                    break;                                                              \
-            }                                                                           \
-            break;                                                                      \
-                                                                                        \
-        case COMPACT_LARGE_INTEGER:                                                     \
-        case COMPACT_LARGE_ATOM:                                                        \
-            switch (first_byte & COMPACT_LARGE_IMM_MASK) {                              \
-                case COMPACT_11BITS_VALUE:                                              \
-                    next_operand_offset += 2;                                           \
-                    break;                                                              \
-                                                                                        \
-                case COMPACT_NBITS_VALUE:                                               \
-                    /* TODO: when first_byte >> 5 is 7, a different encoding is used */ \
-                    next_operand_offset += (first_byte >> 5) + 3;                       \
-                    break;                                                              \
-                                                                                        \
-                default:                                                                \
-                    assert((first_byte & 0x30) != COMPACT_LARGE_INTEGER);               \
-                    break;                                                              \
-            }                                                                           \
-            break;                                                                      \
-                                                                                        \
-        case COMPACT_LARGE_YREG:                                                        \
-            next_operand_offset += 2;                                                   \
-            break;                                                                      \
-                                                                                        \
-        default:                                                                        \
-            fprintf(stderr, "unknown compect term type: %i\n", ((first_byte) & 0xF));   \
-            AVM_ABORT();                                                                \
-            break;                                                                      \
-    }                                                                                   \
+static void DECODE_COMPACT_TERM(const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)
+{
+    uint8_t first_byte = (code_chunk[(base_index) + (off)]);
+    switch (first_byte & 0xF) {
+        case COMPACT_LARGE_LITERAL:
+        case COMPACT_LITERAL:
+            switch (((first_byte) >> 3) & 0x3) {
+                case 0:
+                case 2:
+                    *next_operand_offset += 1;
+                    break;
+
+                case 1:
+                    *next_operand_offset += 2;
+                    break;
+
+                default:
+                    fprintf(stderr, "Operand not literal: %x, or unsupported encoding\n", (first_byte));
+                    AVM_ABORT();
+                    break;
+            }
+            break;
+
+        case COMPACT_SMALLINT4:
+        case COMPACT_ATOM:
+        case COMPACT_XREG:
+        case COMPACT_YREG:
+            *next_operand_offset += 1;
+            break;
+
+        case COMPACT_EXTENDED:
+            switch (first_byte) {
+                case COMPACT_EXTENDED_LITERAL: {
+                    uint8_t ext = (code_chunk[(base_index) + (off) + 1] & 0xF);
+                    if (ext == 0) {
+                        *next_operand_offset += 2;
+                    }else if (ext == 0x8) {
+                        *next_operand_offset += 3;
+                    } else {
+                        AVM_ABORT();
+                    }
+                    break;
+                }
+                default:
+                    printf("Unexpected %i\n", (int) first_byte);
+                    AVM_ABORT();
+                    break;
+            }
+            break;
+
+        case COMPACT_LARGE_INTEGER:
+        case COMPACT_LARGE_ATOM:
+            switch (first_byte & COMPACT_LARGE_IMM_MASK) {
+                case COMPACT_11BITS_VALUE:
+                    *next_operand_offset += 2;
+                    break;
+
+                case COMPACT_NBITS_VALUE:
+                    /* TODO: when first_byte >> 5 is 7, a different encoding is used */
+                    *next_operand_offset += (first_byte >> 5) + 3;
+                    break;
+
+                default:
+                    assert((first_byte & 0x30) != COMPACT_LARGE_INTEGER);
+                    break;
+            }
+            break;
+
+        case COMPACT_LARGE_YREG:
+            *next_operand_offset += 2;
+            break;
+
+        default:
+            fprintf(stderr, "unknown compect term type: %i\n", ((first_byte) & 0xF));
+            AVM_ABORT();
+            break;
+    }
 }
 
 static void DECODE_DEST_REGISTER(dreg_t *dreg, int *dreg_type, const uint8_t *code_chunk, unsigned int base_index, int off, int *next_operand_offset)

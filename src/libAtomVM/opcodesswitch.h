@@ -20,7 +20,7 @@
 
 #include "module.h"
 
-#include <assert.h>
+
 #include <string.h>
 
 #include "bif.h"
