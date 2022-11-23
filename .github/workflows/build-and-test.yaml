@@ -104,7 +104,7 @@ jobs:
           cmake_opts: "-DAVM_DISABLE_FP=on"
 
         - otp: "24"
-          elixir_version: "1.10.4"
+          elixir_version: "1.11"
           cmake_opts: "-DAVM_DISABLE_FP=on"
 
         - os: "ubuntu-18.04"
