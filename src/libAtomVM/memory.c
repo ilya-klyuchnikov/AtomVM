@@ -480,6 +480,10 @@ HOT_FUNC static inline bool memory_heap_fragment_contains_pointer(HeapFragment *
     return false;
 }
 
+HOT_FUNC static inline int term_is_immediate(term t) {
+    return term_is_integer(t) || term_is_atom(t) || term_is_nil(t) || term_is_pid(t);
+}
+
 HOT_FUNC static term memory_shallow_copy_term(HeapFragment *old_fragment, term t, term **new_heap, bool move)
 {
     if (term_is_atom(t)) {
@@ -552,7 +556,9 @@ HOT_FUNC static term memory_shallow_copy_term(HeapFragment *old_fragment, term t
         }
 
         term *dest = *new_heap;
-        dest[0] = list_ptr[0];
+        term tail;
+
+        tail = dest[0] = list_ptr[0];
         dest[1] = list_ptr[1];
         *new_heap += 2;
 
@@ -560,6 +566,36 @@ HOT_FUNC static term memory_shallow_copy_term(HeapFragment *old_fragment, term t
 
         if (move) {
             memory_replace_with_moved_marker(list_ptr, new_term);
+        }
+
+        // AtomVM operates under certain assumptions concerning term copying.
+        // For more details, refer to the memory_copy_term_tree_internal function.
+        // Note that the strategy for optimizing locality of lists is not applicable when it comes to copying terms.
+        if (move) {
+            // Locality optimisation:
+            // This code attempts to move adjacent list cells collectively to improve locality in the new heap.
+            // If the head of the upcoming cons cell contains an immediate term, we can promptly move the next cons cell.
+            // The underlying assumption is that this scenario will be common for strings,
+            // which are lists of small integers that are immediate terms.
+            while (term_is_nonempty_list(tail)) {
+                term *tail_ptr = term_get_list_ptr(tail);
+                if (old_fragment != NULL && !memory_heap_fragment_contains_pointer(old_fragment, tail_ptr)) {
+                    break;
+                }
+                if (memory_is_moved_marker(tail_ptr)) {
+                    break;
+                }
+                if (!term_is_immediate(tail_ptr[1])) {
+                    break;
+                }
+                dest = *new_heap;
+                tail = dest[0] = tail_ptr[0];
+                dest[1] = tail_ptr[1];
+                *new_heap += 2;
+
+                term new_tail = ((term) dest) | 0x1;
+                memory_replace_with_moved_marker(tail_ptr, new_tail);
+            }
         }
 
         return new_term;
